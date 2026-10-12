@@ -38,6 +38,12 @@ if (canvas && !lowData) {
 function start() {
   const { Engine, Bodies, Body, Composite, Query, Constraint, Sleeping } = window.Matter;
   const ctx = canvas.getContext('2d');
+  // Older phone browsers (pre Chrome 99 / Safari 16) lack roundRect; without this every frame throws
+  if (!ctx.roundRect) ctx.roundRect = function (x, y, w, h, r) {
+    r = Math.min(r, w / 2, h / 2);
+    this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath();
+  };
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
   const engine = Engine.create({ enableSleeping: true });
@@ -98,8 +104,8 @@ function start() {
   function populate(dropIn) {
     Composite.remove(engine.world, tiles);
     tiles = [];
-    // Roughly one tile per 34k px² of hero, capped so the pile stays a band at the bottom
-    const n = Math.max(10, Math.min(TILES.length, Math.round((W * H) / 34000)));
+    // Scales with width only, so the pile stays a low band under the hero copy
+    const n = Math.max(9, Math.min(TILES.length, Math.round(W / 80)));
     const defs = TILES.slice(0, n);
     const shapes = SHAPES.slice(0, W < 640 ? 3 : SHAPES.length);
     const all = [...defs.map(d => ['t', d]), ...shapes.map(s => ['s', s])].sort(() => Math.random() - 0.5);
@@ -166,7 +172,7 @@ function start() {
       for (const b of tiles) {
         Sleeping.set(b, false);
         // Cap upward speed so a fast flick shakes the pile without launching it out of the hero
-        const vy = Math.max(-9, b.velocity.y - (1.5 + Math.random() * 2.5) * k);
+        const vy = Math.max(-7, b.velocity.y - (1.5 + Math.random() * 2.5) * k);
         Body.setVelocity(b, { x: b.velocity.x + (Math.random() - 0.5) * 3 * k, y: vy });
         Body.setAngularVelocity(b, b.angularVelocity + (Math.random() - 0.5) * 0.08 * k * spin);
       }

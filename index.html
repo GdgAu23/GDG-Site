@@ -107,13 +107,21 @@
     <!-- nav:end -->
 
     <main id="main">
-      <!-- Hero: logo over a physics field of role tiles (js/hero.js). No copy on purpose; the tiles are the message. -->
-      <section id="top" class="relative min-h-[100svh] flex flex-col overflow-hidden">
+      <!-- Hero: short promise, the next session as a live hook, tiles as a background pile (js/hero.js).
+           Shorter than the viewport on purpose so the photo strip peeks in and invites the scroll.
+           Reads fine without the tiles (data saver, slow networks skip them). -->
+      <section id="top" class="relative min-h-[86svh] md:min-h-[90svh] flex flex-col overflow-hidden">
         <canvas id="hero-canvas" class="absolute inset-0 w-full h-full" aria-hidden="true"></canvas>
-        <h1 class="sr-only">GDG on Campus Africa University: build anything, learn it here</h1>
-        <div class="hero-fade hero-legible relative mx-auto pt-[22svh] md:pt-[20svh] flex items-center gap-4 md:gap-6 pointer-events-none" aria-hidden="true">
-          <img src="/images/gdg-logo.jpg" alt="" width="128" height="128" class="w-20 h-20 md:w-32 md:h-32 rounded-full" />
-          <span class="font-display font-extrabold text-[clamp(4.5rem,16vw,11rem)] leading-none tracking-tight">GDG</span>
+        <div class="relative max-w-[1200px] w-full mx-auto px-4 md:px-8 pt-28 md:pt-36 pointer-events-none">
+          <div class="hero-fade pointer-events-auto mb-6" data-slot="next"></div>
+          <h1 class="hero-fade hero-legible font-display font-extrabold text-[clamp(2.75rem,9vw,7.5rem)] leading-[0.92] tracking-tight">Build anything.<br />Learn it <span class="text-google-blue">here.</span></h1>
+          <p class="hero-fade hero-legible mt-5 text-lg md:text-xl font-medium max-w-[30ch] md:max-w-[46ch]">Free workshops and real projects at Africa University. No experience needed.</p>
+          <div class="hero-fade mt-8 flex flex-wrap gap-2 sm:gap-3 pointer-events-auto">
+            <button type="button" data-open-modal="join" class="btn-press inline-flex items-center gap-2 bg-google-blue text-white font-semibold px-5 sm:px-7 py-3.5 sm:py-4 rounded-full hover:bg-google-blue-dark">
+              Join the club <svg class="w-4 h-4 btn-arrow" aria-hidden="true"><use href="/img/icons.svg#arrow-right"></use></svg>
+            </button>
+            <a href="#roles" class="btn-press inline-flex items-center gap-2 bg-brandBgTertiary border border-brandBorder font-semibold px-5 sm:px-7 py-3.5 sm:py-4 rounded-full hover:border-brandTextPrimary">Find your path</a>
+          </div>
         </div>
       </section>
 

@@ -3,7 +3,7 @@ import { renderPage } from './_lib/page.js';
 import { upcomingEvents, projects, coreTeam, spotlight, posts } from './_lib/db.js';
 import { techFeed } from './_lib/feed.js';
 import { eventRow, projectCard, personCard, postCard, feedCard, empty, icon } from './_lib/views.js';
-import { esc, safeUrl } from './_lib/util.js';
+import { esc, safeUrl, dateParts } from './_lib/util.js';
 
 export async function onRequestGet(ctx) {
   const db = ctx.env.DB;
@@ -22,9 +22,21 @@ export async function onRequestGet(ctx) {
       team: team.length ? team.map(personCard).join('') : `<p class="col-span-full text-brandTextSecondary">The core team for this year is being announced soon.</p>`,
       writing: postList.map(postCard).join('') + feed.map(feedCard).join(''),
       spotlight: star ? spotlightHtml(star) : '',
+      next: events[0] ? nextHtml(events[0]) : '',
     },
-    remove: star ? [] : ['#spotlight'],
+    remove: [...(star ? [] : ['#spotlight']), ...(events[0] ? [] : ['[data-slot="next"]'])],
   });
+}
+
+// Hero hook: the very next session, so the first screen always has something concrete to click.
+function nextHtml(e) {
+  const d = dateParts(e.starts_at);
+  return `<a href="/events/${esc(e.slug)}" class="group inline-flex max-w-full items-center gap-3 rounded-full border border-brandBorder bg-brandBgTertiary pl-2 pr-4 py-2 hover:border-brandTextPrimary">
+    <span class="shrink-0 rounded-full bg-google-green text-white text-xs font-semibold px-2.5 py-1">Next</span>
+    <span class="min-w-0 truncate text-sm font-medium">${esc(e.title)}</span>
+    <span class="shrink-0 text-sm text-brandTextSecondary">${esc(`${d.weekday} ${Number(d.day)} ${d.month}`)}</span>
+    ${icon('arrow-right', 'w-4 h-4 shrink-0 btn-arrow')}
+  </a>`;
 }
 
 const buildCard = () => `
