@@ -4,13 +4,13 @@
 
 ## 🌐 Live Site
 
-[**gdg-africa-university.netlify.app**](https://gdg-africa-university.netlify.app/)
+[**gdg-africa-university.pages.dev**](https://gdg-africa-university.pages.dev/)
 
 Welcome to the official website repository for the **Google Developer Groups (GDG) on Campus at Africa University**. This project serves as a dynamic, scalable, and beautifully designed landing page for our community, providing a centralized hub for events, team introductions, project showcases, and member applications.
 
 ## 🚀 Features
 
-- **Modern UI/UX**: Built with Tailwind CSS and raw HTML/JS for peak performance and aesthetics (featuring animations, glassmorphism, and responsive design).
+- **Design**: Static HTML + Tailwind (CDN) + vanilla JS. Interactive physics hero (`js/hero.js`, Matter.js), a "Pick your path" section for every tech role, light and dark mode. See `DESIGN.md`.
 - **Dynamic Content**: Connected to a **Supabase** (PostgreSQL) backend to securely load and display:
   - 📝 **Blog Posts**
   - 🛠️ **Member Projects**
@@ -25,7 +25,7 @@ Welcome to the official website repository for the **Google Developer Groups (GD
 
 - **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS (via CDN for zero-build-step simplicity)
 - **Backend/Database**: [Supabase](https://supabase.com/) (PostgreSQL + Auth + Storage)
-- **Deployment**: Local testing via live-server, hosted on [Netlify](https://www.netlify.com/) / GitHub Pages.
+- **Deployment**: [Cloudflare Pages](https://pages.cloudflare.com/). `npm run build` copies only public files to `dist/`.
 
 ## 🛠️ Setup & Local Development
 
@@ -33,27 +33,38 @@ This is a static site that relies entirely on frontend JavaScript and a remote S
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Le-e-lab/GDG-Site.git
+   git clone https://github.com/GdgAu23/GDG-Site.git
    cd GDG-Site
    ```
 
-2. **Configure Supabase (`supabase-config.js`):**
+2. **Shared nav, footer and head** live in `partials/`. After editing one, run `npm run partials` to stamp it into every page.
+
+3. **Configure Supabase (`js/supabase-config.js`):**
    - Ensure the URL and ANON API KEY in `supabase-config.js` match your active Supabase project.
 
-3. **Database Schema:**
+4. **Database Schema:**
    - Go to your Supabase project dashboard -> **SQL Editor**.
    - Copy the contents of `database-schema.sql` and run it to initialize all required tables, Row Level Security (RLS) policies, and structure.
 
-4. **Serve the project locally:**
+5. **Serve the project locally:**
    - Because it uses ES modules (`type="module"`), you cannot just double-click the `index.html` file.
    - Use a simple local server. For example:
      - **VS Code**: Install the "Live Server" extension and hit "Go Live".
      - **Node.js**: `npx serve .`
      - **Python**: `python -m http.server 8000`
 
-5. **Access the Application**:
+6. **Access the Application**:
    - Public Site: `http://localhost:8000/index.html`
    - Admin Dashboard: `http://localhost:8000/admin.html` (Requires valid Supabase Auth credentials).
+
+## 🚀 Deploying (Cloudflare Pages)
+
+```bash
+npm run build                      # writes dist/ (never deploy the repo root: it holds .env and SQL)
+CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... npx wrangler pages deploy dist --project-name gdg-africa-university --branch master
+```
+
+If the repo is connected to Cloudflare Pages via Git, use build command `npm run build` and output directory `dist`.
 
 ## 🗄️ Database Tables (Supabase)
 

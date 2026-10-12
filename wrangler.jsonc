@@ -1,0 +1,7 @@
+// Cloudflare Pages config. Only dist/ is ever uploaded: the repo root holds .env and SQL.
+// Build with `npm run build` first.
+{
+  "name": "gdg-africa-university",
+  "pages_build_output_dir": "./dist",
+  "compatibility_date": "2026-10-06"
+}
