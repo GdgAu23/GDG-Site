@@ -1,7 +1,20 @@
-// Cloudflare Pages config. Only dist/ is ever uploaded: the repo root holds .env and SQL.
-// Build with `npm run build` first.
+// Cloudflare Pages config. Only dist/ is uploaded (npm run build makes it);
+// the repo root holds migrations, tests and local secrets.
 {
   "name": "gdg-africa-university",
   "pages_build_output_dir": "./dist",
-  "compatibility_date": "2026-10-06"
+  "compatibility_date": "2026-10-06",
+  "d1_databases": [
+    { "binding": "DB", "database_name": "gdg-au", "database_id": "12175f91-6515-45e9-9c30-1bd3ab8f64f2" }
+  ],
+  "vars": {
+    // Comma-separated Google accounts allowed into /admin
+    "ADMIN_EMAILS": "gdscau2023@gmail.com",
+    // OAuth client ID from Google Cloud Console (public value, safe to commit). Empty until created.
+    "GOOGLE_CLIENT_ID": ""
+  }
+  // Secrets (set with `npx wrangler pages secret put NAME`):
+  //   SESSION_SECRET      random 32+ chars, signs admin sessions
+  //   APPS_SCRIPT_URL     the deployed Gmail Apps Script web app URL
+  //   APPS_SCRIPT_SECRET  shared secret, must match the script's SHARED_SECRET property
 }

@@ -1,91 +1,113 @@
-# GDG Africa University Website
+# GDG Africa University
 
-![GDG Badge](https://img.shields.io/badge/Google_Developer_Groups-Africa_University-blue.svg?logo=google&logoColor=white)
+The website of Google Developer Groups on Campus, Africa University (Mutare, Zimbabwe):
+events with their slides and recordings, member projects and profiles, a learning hub, and a blog
+that always has something new.
 
-## 🌐 Live Site
+**Live:** <https://gdg-africa-university.pages.dev> · **Admin:** `/admin` (club Google account only)
 
-[**gdg-africa-university.pages.dev**](https://gdg-africa-university.pages.dev/)
+## How it's built
 
-Welcome to the official website repository for the **Google Developer Groups (GDG) on Campus at Africa University**. This project serves as a dynamic, scalable, and beautifully designed landing page for our community, providing a centralized hub for events, team introductions, project showcases, and member applications.
+Plain HTML, Tailwind and a little vanilla JS, served by **Cloudflare Pages**. Dynamic pages are
+rendered on Cloudflare's edge by **Pages Functions** reading a **D1** (SQLite) database, so visitors
+get finished HTML in one request (fast on slow connections, readable by Google).
 
-## 🚀 Features
-
-- **Design**: Static HTML + Tailwind (CDN) + vanilla JS. Interactive physics hero (`js/hero.js`, Matter.js), a "Pick your path" section for every tech role, light and dark mode. See `DESIGN.md`.
-- **Dynamic Content**: Connected to a **Supabase** (PostgreSQL) backend to securely load and display:
-  - 📝 **Blog Posts**
-  - 🛠️ **Member Projects**
-  - 👥 **Core Team Profiles**
-  - 📅 **Upcoming Events**
-  - 💬 **Testimonials**
-- **Admin Dashboard**: A hidden secure panel (`/admin.html`) enabling community leads to seamlessly perform CRUD operations on all site data without touching code. Includes overview stats, search filtering, and customizable previews.
-- **Lead Applications**: A public form where passionate members can apply to become Core Team leads, feeding directly into the Admin dashboard.
-- **Newsletter Subscription**: Integrated mailing list captures.
-
-## 💻 Tech Stack
-
-- **Frontend**: HTML5, Vanilla JavaScript, Tailwind CSS (via CDN for zero-build-step simplicity)
-- **Backend/Database**: [Supabase](https://supabase.com/) (PostgreSQL + Auth + Storage)
-- **Deployment**: [Cloudflare Pages](https://pages.cloudflare.com/). `npm run build` copies only public files to `dist/`.
-
-## 🛠️ Setup & Local Development
-
-This is a static site that relies entirely on frontend JavaScript and a remote Supabase project.
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/GdgAu23/GDG-Site.git
-   cd GDG-Site
-   ```
-
-2. **Shared nav, footer and head** live in `partials/`. After editing one, run `npm run partials` to stamp it into every page.
-
-3. **Configure Supabase (`js/supabase-config.js`):**
-   - Ensure the URL and ANON API KEY in `supabase-config.js` match your active Supabase project.
-
-4. **Database Schema:**
-   - Go to your Supabase project dashboard -> **SQL Editor**.
-   - Copy the contents of `database-schema.sql` and run it to initialize all required tables, Row Level Security (RLS) policies, and structure.
-
-5. **Serve the project locally:**
-   - Because it uses ES modules (`type="module"`), you cannot just double-click the `index.html` file.
-   - Use a simple local server. For example:
-     - **VS Code**: Install the "Live Server" extension and hit "Go Live".
-     - **Node.js**: `npx serve .`
-     - **Python**: `python -m http.server 8000`
-
-6. **Access the Application**:
-   - Public Site: `http://localhost:8000/index.html`
-   - Admin Dashboard: `http://localhost:8000/admin.html` (Requires valid Supabase Auth credentials).
-
-## 🚀 Deploying (Cloudflare Pages)
-
-```bash
-npm run build                      # writes dist/ (never deploy the repo root: it holds .env and SQL)
-CLOUDFLARE_API_TOKEN=... CLOUDFLARE_ACCOUNT_ID=... npx wrangler pages deploy dist --project-name gdg-africa-university --branch master
+```
+index.html, events.html, ...   Page shells. Static copy lives here; data-slot="x" marks where data goes
+templates/page.html            Shell for detail pages (event, project, person, post)
+partials/                      Shared head, nav, footer, modals. Stamped into every page on build
+css/app.css                    Design tokens + Tailwind entry (compiled on build, no CDN)
+js/site.js                     Public UI: theme toggle, menu, modals, forms, filters
+js/hero.js                     Homepage physics hero (Matter.js, skipped on data-saver/2G)
+js/admin.js                    Admin dashboard
+functions/                     Server routes (file path = URL)
+  index.js, events/, projects/, people/, blog/, learn.js, sitemap.xml.js
+  api/join.js, apply.js, subscribe.js     Public form endpoints
+  api/admin/                   Admin API (Google sign-in session required)
+  _lib/                        Shared: db queries, HTML views, auth, markdown, tech feed
+migrations/                    D1 schema and seed (numbered, applied in order)
+integrations/apps-script/      Gmail script that sends welcome and weekly emails
+scripts/build.mjs              Build: partials -> Tailwind -> icon sprite -> dist/
+tests/                         Vitest tests for the server logic
 ```
 
-If the repo is connected to Cloudflare Pages via Git, use build command `npm run build` and output directory `dist`.
+## Work on it locally
 
-## 🗄️ Database Tables (Supabase)
+Needs Node 20+.
 
-Make sure the following tables are correctly configured with RLS policies in your Supabase project (refer to `database-schema.sql`):
-- `blog`
-- `projects`
-- `team`
-- `events`
-- `testimonials`
-- `applications`
-- `newsletter_subscribers`
+```bash
+npm install
+cp .dev.vars.example .dev.vars        # local secrets; lets you sign into /admin without Google
+npm run db:migrate:local              # creates a local copy of the database
+npm run dev                           # http://localhost:8788  (admin: /admin -> "Dev sign-in")
+npm test
+```
 
-## 🤝 Contributing
+`npm run dev` builds once. After editing HTML, CSS or a partial, run `npm run build` again
+(functions reload by themselves).
 
-We welcome community members to propose improvements!
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingIdea`)
-3. Commit your Changes (`git commit -m 'Add some AmazingIdea'`)
-4. Push to the Branch (`git push origin feature/AmazingIdea`)
-5. Open a Pull Request
+## Common changes
 
----
+| I want to... | Do this |
+|---|---|
+| Add or edit events, slides, projects, people, posts, packs | Use `/admin`. No code. |
+| Change wording on a page | Edit the matching `.html` file |
+| Change the nav or footer | Edit `partials/nav.html` / `footer.html`, then `npm run build` |
+| Change how an event/project card looks | `functions/_lib/views.js` |
+| Add a database column | New file in `migrations/` (e.g. `0003_add_x.sql`), add the column to `functions/_lib/admin-tables.js` and a field in `SCHEMAS` in `js/admin.js` |
+| Add an icon | Use `icon('name')` (server) or `<use href="/img/icons.svg#name">`. Names from <https://phosphoricons.com>; the build adds it to the sprite |
+| Update the Learn page rankings | Regenerate the numbers from the cited sources and edit `learn.html` |
 
-*Build with us, learn with us, and grow with the GDG Africa University community.*
+Design rules (colours, type, shapes, motion) are in [DESIGN.md](DESIGN.md).
+
+## Deploy
+
+```bash
+npm run db:migrate:remote   # only when migrations/ changed
+npm run deploy              # builds dist/ and uploads it with the functions
+```
+
+Needs `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` in your environment (Pages + D1 edit permissions).
+**Never deploy the repo root**: only `dist/` (the build whitelists public files).
+
+To deploy automatically on every push instead: Cloudflare dashboard > Workers & Pages >
+`gdg-africa-university` > Settings > Builds > connect `GdgAu23/GDG-Site`, build command
+`npm run build`, output directory `dist`.
+
+## Admin setup (once)
+
+### 1. Session secret
+```bash
+openssl rand -hex 32 | npx wrangler pages secret put SESSION_SECRET --project-name gdg-africa-university
+```
+
+### 2. Google sign-in
+Only accounts listed in `ADMIN_EMAILS` (`wrangler.jsonc`) can get in. To create the client ID:
+
+1. As **gdscau2023@gmail.com**, open <https://console.cloud.google.com>, create a project (e.g. "GDG AU site").
+2. Go to **Google Auth Platform** (older consoles: APIs & Services > OAuth consent screen). Set the app
+   name and support email, audience **External**. Under **Audience > Test users**, add
+   `gdscau2023@gmail.com`. Basic sign-in (name, email) doesn't need Google's review.
+3. **Clients > Create client > Web application**. Under **Authorized JavaScript origins** add
+   `https://gdg-africa-university.pages.dev` and `http://localhost:8788` (and your domain later).
+4. Copy the **Client ID** into `GOOGLE_CLIENT_ID` in `wrangler.jsonc`, commit, and deploy.
+
+To add another admin, add their Gmail to `ADMIN_EMAILS` (comma separated) and deploy.
+
+### 3. Emails
+Follow [integrations/apps-script/README.md](integrations/apps-script/README.md). The admin
+Overview page shows a checklist of what's configured.
+
+## WhatsApp
+
+WhatsApp doesn't allow websites to post into an existing group safely (its official API only works
+for verified business numbers and groups of up to 8). Instead, every event in admin has a
+**WhatsApp** button that opens WhatsApp with the message ready, the Overview page has "This week's
+WhatsApp post", and the Monday email sends the same one-tap link.
+
+## Content sources
+
+- Tech feed on the blog and homepage: [DEV Community API](https://developers.forem.com/api), cached
+  for an hour at the edge.
+- Learn page rankings: Stack Overflow Developer Survey 2025, TIOBE Index (October 2026), GitHub
+  Octoverse 2025 and the WEF Future of Jobs Report 2025, each linked next to its chart.

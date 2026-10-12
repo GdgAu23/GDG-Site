@@ -1,24 +1,16 @@
 node_modules/
 .DS_Store
-.gemini/
 *.log
 
-# Local secrets (Supabase access token etc.) — never commit
+# Local secrets: never commit
 .env
 .env.local
+.dev.vars
+!.dev.vars.example
 
-# Raw photo originals (compressed versions are used on the site)
+# Raw photo originals (site uses images/club/*.webp)
 images/*.JPG
 
-# Supabase CLI local state
-supabase/.temp/
-supabase/.branches/
-supabase/.env
-
-# Cloudflare Pages build output
+# Build output and local Cloudflare state
 dist/
 .wrangler/
-
-.dev.vars*
-!.dev.vars.example
-!.env.example

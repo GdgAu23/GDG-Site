@@ -1,46 +1,47 @@
-    <footer class="border-t border-brandBorder bg-brandBgPrimary">
-      <div class="max-w-[1200px] mx-auto px-4 md:px-8 pt-16 md:pt-24 pb-10">
-        <div class="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+    <footer class="relative border-t border-brandBorder bg-brandBgPrimary overflow-hidden">
+      <div class="max-w-[1200px] mx-auto px-4 md:px-8 pt-16 md:pt-24">
+        <div class="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
           <div>
-            <p class="font-display font-extrabold text-4xl md:text-5xl leading-[0.95] text-brandTextPrimary max-w-[11ch]">Come build something with us.</p>
-            <div class="flex gap-2 mt-8">
-              <a href="https://www.tiktok.com/@au_gdsc" target="_blank" rel="noopener" aria-label="TikTok" class="w-11 h-11 grid place-items-center rounded-full border border-brandBorder text-brandTextSecondary hover:text-brandTextPrimary hover:border-brandTextPrimary"><i class="ph ph-tiktok-logo text-xl"></i></a>
-              <a href="https://www.instagram.com/au_gdsc" target="_blank" rel="noopener" aria-label="Instagram" class="w-11 h-11 grid place-items-center rounded-full border border-brandBorder text-brandTextSecondary hover:text-brandTextPrimary hover:border-brandTextPrimary"><i class="ph ph-instagram-logo text-xl"></i></a>
-              <a href="https://github.com/GdgAu23" target="_blank" rel="noopener" aria-label="GitHub" class="w-11 h-11 grid place-items-center rounded-full border border-brandBorder text-brandTextSecondary hover:text-brandTextPrimary hover:border-brandTextPrimary"><i class="ph ph-github-logo text-xl"></i></a>
-              <a href="https://www.linkedin.com/in/google-developer-group-on-campus-au-50317828b" target="_blank" rel="noopener" aria-label="LinkedIn" class="w-11 h-11 grid place-items-center rounded-full border border-brandBorder text-brandTextSecondary hover:text-brandTextPrimary hover:border-brandTextPrimary"><i class="ph ph-linkedin-logo text-xl"></i></a>
+            <p class="font-display font-extrabold text-4xl sm:text-5xl md:text-6xl leading-[0.92] max-w-[12ch]">Come build something with us.</p>
+            <div class="mt-8 flex flex-wrap gap-2">
+              <button type="button" data-open-modal="join" class="btn-press bg-google-blue text-white font-semibold px-6 py-3.5 rounded-full hover:bg-google-blue-dark">Join the club</button>
+              <a href="https://chat.whatsapp.com/HMTLxxUu00V3GZ6SEZjxdy" target="_blank" rel="noopener" class="btn-press inline-flex items-center gap-2 border border-brandBorder font-semibold px-5 py-3.5 rounded-full hover:border-brandTextPrimary"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#whatsapp-logo"></use></svg> WhatsApp</a>
             </div>
           </div>
           <div>
-            <p class="font-mono text-xs text-brandTextSecondary mb-4">Club</p>
-            <ul class="space-y-2.5 text-[15px]">
-              <li><a href="index.html#roles" class="hover:text-google-blue">Paths</a></li>
-              <li><a href="index.html#team" class="hover:text-google-blue">Core team</a></li>
-              <li><a href="projects.html" class="hover:text-google-blue">Projects</a></li>
-              <li><a href="blog.html" class="hover:text-google-blue">Blog</a></li>
-            </ul>
-          </div>
-          <div>
-            <p class="font-mono text-xs text-brandTextSecondary mb-4">Learn</p>
-            <ul class="space-y-2.5 text-[15px]">
-              <li><a href="plan.html" class="hover:text-google-blue">Semester plan</a></li>
-              <li><a href="events.html" class="hover:text-google-blue">Events</a></li>
-              <li><a href="resources.html" class="hover:text-google-blue">Student packs</a></li>
-              <li><a href="https://developers.google.com/" target="_blank" rel="noopener" class="hover:text-google-blue">Google Developers</a></li>
-            </ul>
-          </div>
-          <div>
-            <p class="font-mono text-xs text-brandTextSecondary mb-4">Talk to us</p>
-            <ul class="space-y-2.5 text-[15px]">
-              <li><a href="https://chat.whatsapp.com/HMTLxxUu00V3GZ6SEZjxdy" target="_blank" rel="noopener" class="hover:text-google-blue">WhatsApp group</a></li>
-              <li><a href="https://discord.gg/5gepG5Mj" target="_blank" rel="noopener" class="hover:text-google-blue">Discord</a></li>
-              <li><a href="https://gdg.community.dev/" target="_blank" rel="noopener" class="hover:text-google-blue">GDG on Bevy</a></li>
-              <li><a href="https://www.africau.edu/" target="_blank" rel="noopener" class="hover:text-google-blue">Africa University</a></li>
-            </ul>
+            <p class="font-display font-bold text-xl">One email a week</p>
+            <p class="text-brandTextSecondary mt-1">New sessions, slides from the last one, and openings for students.</p>
+            <form data-form="subscribe" class="mt-4 flex flex-col sm:flex-row gap-2" novalidate>
+              <label for="footer-email" class="sr-only">Email address</label>
+              <input id="footer-email" type="email" name="email" required autocomplete="email" placeholder="you@africau.edu" class="field !rounded-full flex-1 min-w-0" />
+              <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+              <button type="submit" class="btn-press rounded-full px-6 py-3 font-semibold bg-brandTextPrimary text-brandBgPrimary">Subscribe</button>
+            </form>
+            <p data-form-status class="mt-2 text-sm min-h-5" role="status"></p>
           </div>
         </div>
-        <div class="mt-16 pt-6 border-t border-brandBorder flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-brandTextSecondary">
+        <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-8 text-[15px]">
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Learn</p>
+            <ul class="space-y-2.5"><li><a href="/learn" class="hover:text-google-blue">Learning paths</a></li><li><a href="/learn#rankings" class="hover:text-google-blue">Tech rankings</a></li><li><a href="/learn#packs" class="hover:text-google-blue">Student packs</a></li><li><a href="/blog" class="hover:text-google-blue">Blog</a></li></ul>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Club</p>
+            <ul class="space-y-2.5"><li><a href="/events" class="hover:text-google-blue">Events</a></li><li><a href="/projects" class="hover:text-google-blue">Projects</a></li><li><a href="/people" class="hover:text-google-blue">People</a></li><li><a href="/#apply" class="hover:text-google-blue">Lead a path</a></li></ul>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Find us</p>
+            <ul class="space-y-2.5"><li><a href="https://discord.gg/5gepG5Mj" target="_blank" rel="noopener" class="hover:text-google-blue">Discord</a></li><li><a href="https://www.instagram.com/au_gdsc" target="_blank" rel="noopener" class="hover:text-google-blue">Instagram</a></li><li><a href="https://www.tiktok.com/@au_gdsc" target="_blank" rel="noopener" class="hover:text-google-blue">TikTok</a></li><li><a href="https://www.linkedin.com/in/google-developer-group-on-campus-au-50317828b" target="_blank" rel="noopener" class="hover:text-google-blue">LinkedIn</a></li></ul>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Elsewhere</p>
+            <ul class="space-y-2.5"><li><a href="https://github.com/GdgAu23" target="_blank" rel="noopener" class="hover:text-google-blue">GitHub</a></li><li><a href="https://gdg.community.dev/" target="_blank" rel="noopener" class="hover:text-google-blue">GDG on Bevy</a></li><li><a href="https://developers.google.com/" target="_blank" rel="noopener" class="hover:text-google-blue">Google Developers</a></li><li><a href="https://www.africau.edu/" target="_blank" rel="noopener" class="hover:text-google-blue">Africa University</a></li></ul>
+          </div>
+        </div>
+        <div class="mt-16 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-brandTextSecondary">
           <p>&copy; <span data-year>2026</span> GDG on Campus Africa University. Part of Google Developer Groups.</p>
           <p>Made by students in Mutare, Zimbabwe.</p>
         </div>
       </div>
+      <p class="wordmark font-display font-extrabold select-none mt-8 -mb-[0.12em] px-2 whitespace-nowrap text-center" aria-hidden="true"><span class="text-google-blue">G</span><span class="text-google-red">D</span><span class="text-google-yellow">G</span><span class="text-google-green">&nbsp;AU</span></p>
     </footer>

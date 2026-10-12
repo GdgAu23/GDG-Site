@@ -20,11 +20,19 @@ const TILES = [
 ];
 const SHAPES = [['circle', 'blue'], ['triangle', 'green'], ['square', 'red'], ['circle', 'yellow'], ['triangle', 'red'], ['square', 'blue']];
 
-if (canvas) {
-  const s = document.createElement('script');
-  s.src = MATTER_SRC;
-  s.onload = () => document.fonts.ready.then(start);
-  document.head.appendChild(s);
+// Skip the physics (and its ~80KB library) on data-saver or very slow connections.
+const conn = navigator.connection || {};
+const lowData = conn.saveData || /(^|-)2g$/.test(conn.effectiveType || '');
+
+if (canvas && !lowData) {
+  const load = () => {
+    const s = document.createElement('script');
+    s.src = MATTER_SRC;
+    s.onload = () => document.fonts.ready.then(start);
+    document.head.appendChild(s);
+  };
+  // Let the page finish its own work first
+  'requestIdleCallback' in window ? requestIdleCallback(load, { timeout: 1500 }) : setTimeout(load, 300);
 }
 
 function start() {
@@ -229,7 +237,9 @@ function start() {
 
   // ── Lifecycle ─────────────────────────────────
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) wake(); }).observe(canvas);
-  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { theme = readTheme(); draw(); });
+  const retheme = () => { theme = readTheme(); draw(); };
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', retheme);
+  document.addEventListener('themechange', retheme);
 
   let lastW = 0, resizeTimer;
   new ResizeObserver(() => {

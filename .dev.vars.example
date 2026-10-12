@@ -1,0 +1,7 @@
+# Copy to .dev.vars for `npm run dev`. Never commit .dev.vars.
+SESSION_SECRET=local-dev-secret-change-me-0123456789
+# Lets you sign into /admin on localhost without Google
+DEV_ADMIN_EMAIL=gdscau2023@gmail.com
+# Optional: test real emails locally
+# APPS_SCRIPT_URL=
+# APPS_SCRIPT_SECRET=

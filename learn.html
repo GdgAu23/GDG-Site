@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learn | GDG Africa University</title>
+    <meta name="description" content="Roadmaps for web, mobile, game dev, AI, cloud, design, data and security, free places to learn each, and the latest language and job rankings from Stack Overflow, TIOBE, GitHub and the WEF." />
+    <link rel="canonical" href="https://gdg-africa-university.pages.dev/learn" />
+    <meta property="og:site_name" content="GDG Africa University" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Learn | GDG Africa University" />
+    <meta property="og:description" content="Roadmaps for web, mobile, game dev, AI, cloud, design, data and security, free places to learn each, and the latest language and job rankings from Stack Overflow, TIOBE, GitHub and the WEF." />
+    <meta property="og:url" content="https://gdg-africa-university.pages.dev/learn" />
+    <meta property="og:image" content="https://gdg-africa-university.pages.dev/images/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"ItemList","name":"Learning paths","itemListElement":[{"@type":"ListItem","position":1,"name":"Game development","url":"https://gdg-africa-university.pages.dev/learn#game"},{"@type":"ListItem","position":2,"name":"Web development","url":"https://gdg-africa-university.pages.dev/learn#web"},{"@type":"ListItem","position":3,"name":"Mobile","url":"https://gdg-africa-university.pages.dev/learn#mobile"},{"@type":"ListItem","position":4,"name":"AI and machine learning","url":"https://gdg-africa-university.pages.dev/learn#ai"},{"@type":"ListItem","position":5,"name":"Cloud and DevOps","url":"https://gdg-africa-university.pages.dev/learn#cloud"},{"@type":"ListItem","position":6,"name":"UI/UX design","url":"https://gdg-africa-university.pages.dev/learn#design"},{"@type":"ListItem","position":7,"name":"Data","url":"https://gdg-africa-university.pages.dev/learn#data"},{"@type":"ListItem","position":8,"name":"Cybersecurity","url":"https://gdg-africa-university.pages.dev/learn#security"}]}</script>
+    <!-- head:start -->
+    <script>(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark')d.dataset.theme=t}catch(e){}})();</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Non-blocking fonts: text renders in system fonts first on slow connections -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Geist:wght@400..600&display=swap" media="print" onload="this.media='all'" />
+    <link rel="stylesheet" href="/css/app.css" />
+    <link rel="icon" type="image/jpeg" href="/images/gdg-logo.jpg" />
+    <link rel="apple-touch-icon" href="/images/gdg-logo.jpg" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#f5f6f9" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101217" media="(prefers-color-scheme: dark)" />
+    <!-- head:end -->
+  </head>
+  <body class="font-sans antialiased">
+    <a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[70] bg-google-blue text-white px-4 py-2 rounded-full">Skip to content</a>
+    <!-- nav:start -->
+    <nav id="main-nav" class="fixed inset-x-0 top-0 z-50" aria-label="Main">
+      <div class="max-w-[1200px] mx-auto h-16 md:h-[72px] px-4 md:px-8 flex items-center gap-3">
+        <a href="/" class="flex items-center gap-2.5 shrink-0 mr-auto lg:mr-0" aria-label="GDG Africa University home">
+          <img src="/images/gdg-logo.jpg" alt="" width="34" height="34" class="w-[34px] h-[34px] rounded-full" />
+          <span class="font-display font-bold text-[17px] leading-none">GDG <span class="font-medium text-brandTextSecondary hidden min-[380px]:inline">Africa University</span></span>
+        </a>
+        <ul class="hidden lg:flex mx-auto items-center text-[15px] font-medium text-brandTextSecondary">
+          <li><a href="/learn" data-nav class="nav-link block px-3.5 py-2 hover:text-brandTextPrimary">Learn</a></li>
+          <li><a href="/events" data-nav class="nav-link block px-3.5 py-2 hover:text-brandTextPrimary">Events</a></li>
+          <li><a href="/projects" data-nav class="nav-link block px-3.5 py-2 hover:text-brandTextPrimary">Projects</a></li>
+          <li><a href="/people" data-nav class="nav-link block px-3.5 py-2 hover:text-brandTextPrimary">People</a></li>
+          <li><a href="/blog" data-nav class="nav-link block px-3.5 py-2 hover:text-brandTextPrimary">Blog</a></li>
+        </ul>
+        <div class="flex items-center gap-1.5">
+          <button type="button" data-theme-toggle class="btn-press w-10 h-10 grid place-items-center rounded-full text-brandTextPrimary hover:bg-brandBgSecondary" aria-label="Switch to dark mode">
+            <svg class="w-5 h-5 dark:hidden" aria-hidden="true"><use href="/img/icons.svg#moon"></use></svg>
+            <svg class="w-5 h-5 hidden dark:block" aria-hidden="true"><use href="/img/icons.svg#sun"></use></svg>
+          </button>
+          <button type="button" data-open-modal="join" class="btn-press hidden sm:inline-flex items-center bg-google-blue text-white text-[15px] font-semibold px-5 py-2.5 rounded-full hover:bg-google-blue-dark">Join the club</button>
+          <button type="button" id="menu-btn" class="lg:hidden w-10 h-10 grid place-items-center rounded-full text-brandTextPrimary hover:bg-brandBgSecondary" aria-label="Open menu" aria-controls="menu-overlay" aria-expanded="false">
+            <span class="hamburger-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <div id="menu-overlay" class="fixed inset-0 z-[45] lg:hidden bg-brandBgPrimary overflow-y-auto" aria-label="Menu">
+      <div class="min-h-full flex flex-col px-4 md:px-8 pt-24 pb-8 max-w-[760px] mx-auto">
+        <ul class="flex-1">
+          <li class="menu-item border-b border-brandBorder" style="--i:0"><a href="/learn" class="flex items-baseline gap-4 py-5"><span class="w-3 h-3 rounded-full bg-google-blue shrink-0 translate-y-[-4px]"></span><span><span class="block font-display font-extrabold text-4xl sm:text-5xl">Learn</span><span class="block text-brandTextSecondary mt-1">Paths, rankings and where to start</span></span></a></li>
+          <li class="menu-item border-b border-brandBorder" style="--i:1"><a href="/events" class="flex items-baseline gap-4 py-5"><span class="w-3 h-3 rounded-full bg-google-red shrink-0 translate-y-[-4px]"></span><span><span class="block font-display font-extrabold text-4xl sm:text-5xl">Events</span><span class="block text-brandTextSecondary mt-1">Sessions, slides and recordings</span></span></a></li>
+          <li class="menu-item border-b border-brandBorder" style="--i:2"><a href="/projects" class="flex items-baseline gap-4 py-5"><span class="w-3 h-3 rounded-full bg-google-yellow shrink-0 translate-y-[-4px]"></span><span><span class="block font-display font-extrabold text-4xl sm:text-5xl">Projects</span><span class="block text-brandTextSecondary mt-1">What members shipped, and who's hiring teammates</span></span></a></li>
+          <li class="menu-item border-b border-brandBorder" style="--i:3"><a href="/people" class="flex items-baseline gap-4 py-5"><span class="w-3 h-3 rounded-full bg-google-green shrink-0 translate-y-[-4px]"></span><span><span class="block font-display font-extrabold text-4xl sm:text-5xl">People</span><span class="block text-brandTextSecondary mt-1">The team and members' stories</span></span></a></li>
+          <li class="menu-item border-b border-brandBorder" style="--i:4"><a href="/blog" class="flex items-baseline gap-4 py-5"><span class="w-3 h-3 rounded-full bg-brandTextPrimary shrink-0 translate-y-[-4px]"></span><span><span class="block font-display font-extrabold text-4xl sm:text-5xl">Blog</span><span class="block text-brandTextSecondary mt-1">Club posts and the latest from the tech world</span></span></a></li>
+        </ul>
+        <div class="menu-item mt-10" style="--i:5">
+          <button type="button" data-open-modal="join" class="btn-press w-full bg-google-blue text-white font-semibold py-4 rounded-full text-lg">Join the club</button>
+          <div class="mt-6 flex justify-center gap-2">
+            <a href="https://chat.whatsapp.com/HMTLxxUu00V3GZ6SEZjxdy" target="_blank" rel="noopener" aria-label="WhatsApp group" class="w-12 h-12 grid place-items-center rounded-full border border-brandBorder"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#whatsapp-logo"></use></svg></a>
+            <a href="https://discord.gg/5gepG5Mj" target="_blank" rel="noopener" aria-label="Discord" class="w-12 h-12 grid place-items-center rounded-full border border-brandBorder"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#discord-logo"></use></svg></a>
+            <a href="https://www.instagram.com/au_gdsc" target="_blank" rel="noopener" aria-label="Instagram" class="w-12 h-12 grid place-items-center rounded-full border border-brandBorder"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#instagram-logo"></use></svg></a>
+            <a href="https://github.com/GdgAu23" target="_blank" rel="noopener" aria-label="GitHub" class="w-12 h-12 grid place-items-center rounded-full border border-brandBorder"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#github-logo"></use></svg></a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- nav:end -->
+    <main id="main">
+      <header class="pt-32 md:pt-44 pb-10 md:pb-14">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+          <h1 class="font-display font-extrabold text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.95] max-w-[15ch]">Know what to learn, <span class="text-google-blue">and where.</span></h1>
+          <p class="hero-fade mt-6 text-lg md:text-xl text-brandTextSecondary max-w-[56ch] leading-relaxed">Start with the basics every developer needs, pick a path, and use free resources from people who teach it best. Then see what the world's developer studies say is in demand.</p>
+          <nav class="mt-8 -mx-4 px-4 flex gap-2 overflow-x-auto h-scroll" aria-label="Jump to a path">
+            <a href="#basics" class="shrink-0 inline-flex items-center px-4 py-2 rounded-full bg-brandTextPrimary text-brandBgPrimary text-sm font-semibold">The basics</a><a href="#game" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#game-controller"></use></svg>Game development</a><a href="#web" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#browser"></use></svg>Web development</a><a href="#mobile" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#device-mobile"></use></svg>Mobile</a><a href="#ai" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#brain"></use></svg>AI and ML</a><a href="#cloud" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#cloud-arrow-up"></use></svg>Cloud</a><a href="#design" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#pen-nib"></use></svg>UI/UX design</a><a href="#data" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#chart-line-up"></use></svg>Data</a><a href="#security" class="shrink-0 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary"><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#shield-check"></use></svg>Cybersecurity</a>
+            <a href="#rankings" class="shrink-0 inline-flex items-center px-4 py-2 rounded-full border border-brandBorder text-sm font-semibold hover:border-brandTextPrimary">Rankings</a>
+          </nav>
+        </div>
+      </header>
+
+      <section id="basics" class="scroll-mt-24 py-16 md:py-24 bg-brandBgSecondary">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+          <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] max-w-[16ch]">The basics everyone needs.</h2>
+          <p class="mt-4 text-lg text-brandTextSecondary max-w-[56ch]">Whatever path you pick, these carry you. If a session ever felt like it went too fast, the gap is usually one of these.</p>
+          <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 flex flex-col">
+              <svg class="w-8 h-8 text-google-blue shrink-0" aria-hidden="true"><use href="/img/icons.svg#git-branch"></use></svg>
+              <h3 class="font-display font-bold text-xl mt-5">Git and GitHub</h3>
+              <p class="text-brandTextSecondary mt-2 leading-relaxed">Save versions of your work, collaborate without overwriting each other, and show your code to employers.</p>
+              <ul class="mt-auto pt-5 space-y-1.5"><li><a href="https://skills.github.com/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">GitHub Skills <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://git-scm.com/book/en/v2" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">Pro Git book <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul>
+            </article>
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 flex flex-col">
+              <svg class="w-8 h-8 text-google-blue shrink-0" aria-hidden="true"><use href="/img/icons.svg#terminal-window"></use></svg>
+              <h3 class="font-display font-bold text-xl mt-5">The command line</h3>
+              <p class="text-brandTextSecondary mt-2 leading-relaxed">Every path uses it. Moving around folders, running programs and reading errors calmly.</p>
+              <ul class="mt-auto pt-5 space-y-1.5"><li><a href="https://missing.csail.mit.edu/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">The Missing Semester (MIT) <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://overthewire.org/wargames/bandit/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">OverTheWire Bandit <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul>
+            </article>
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 flex flex-col">
+              <svg class="w-8 h-8 text-google-blue shrink-0" aria-hidden="true"><use href="/img/icons.svg#globe"></use></svg>
+              <h3 class="font-display font-bold text-xl mt-5">How the web works</h3>
+              <p class="text-brandTextSecondary mt-2 leading-relaxed">What happens when you type a URL. DNS, HTTP, servers and browsers, explained once properly.</p>
+              <ul class="mt-auto pt-5 space-y-1.5"><li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development/Getting_started/Web_standards/How_the_web_works" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">MDN: How the web works <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul>
+            </article>
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 flex flex-col">
+              <svg class="w-8 h-8 text-google-blue shrink-0" aria-hidden="true"><use href="/img/icons.svg#puzzle-piece"></use></svg>
+              <h3 class="font-display font-bold text-xl mt-5">Problem solving</h3>
+              <p class="text-brandTextSecondary mt-2 leading-relaxed">Breaking a problem down, basic data structures, and thinking before typing.</p>
+              <ul class="mt-auto pt-5 space-y-1.5"><li><a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">CS50x (Harvard) <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://www.freecodecamp.org/learn" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">freeCodeCamp <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul>
+            </article>
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 flex flex-col">
+              <svg class="w-8 h-8 text-google-blue shrink-0" aria-hidden="true"><use href="/img/icons.svg#sparkle"></use></svg>
+              <h3 class="font-display font-bold text-xl mt-5">Using AI well</h3>
+              <p class="text-brandTextSecondary mt-2 leading-relaxed">Use assistants to learn faster, not to skip learning. Always read and test what they write.</p>
+              <ul class="mt-auto pt-5 space-y-1.5"><li><a href="https://ai.google.dev/gemini-api/docs" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">Gemini API docs <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://grow.google/prompting-essentials/" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">Google Prompting Essentials <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul>
+            </article>
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 flex flex-col">
+              <svg class="w-8 h-8 text-google-blue shrink-0" aria-hidden="true"><use href="/img/icons.svg#chats-circle"></use></svg>
+              <h3 class="font-display font-bold text-xl mt-5">Asking good questions</h3>
+              <p class="text-brandTextSecondary mt-2 leading-relaxed">Show what you tried, the exact error and a small example. You will get answers twice as fast.</p>
+              <ul class="mt-auto pt-5 space-y-1.5"><li><a href="https://stackoverflow.com/help/how-to-ask" target="_blank" rel="noopener" class="inline-flex items-center gap-1.5 text-sm font-semibold text-google-blue hover:underline">How to ask (Stack Overflow) <svg class="w-3.5 h-3.5 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="paths" class="py-16 md:py-24">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+          <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] max-w-[16ch]">Pick a path. Here's the road.</h2>
+          <p class="mt-4 text-lg text-brandTextSecondary max-w-[56ch]">Each path has an order that works, free places to learn it, and a first project worth putting on your CV.</p>
+          <div class="mt-10">
+          <article id="game" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-red text-white"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#game-controller"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">Game development</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who want to make things others play. Coders, artists, writers and sound people all fit.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">A one-screen arcade game with a high score.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Pick one engine: Godot (free, light on old laptops) or Unity</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">Make a tiny 2D game: move, jump, collide, score</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Learn game feel: juice, sound, feedback</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Ship a build to itch.io and get strangers to play it</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://docs.godotengine.org/en/stable/getting_started/first_2d_game/index.html" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Godot: your first 2D game</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://learn.unity.com/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Unity Learn</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://docs.flame-engine.org/latest/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Flame engine (Flutter)</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://www.blender.org/support/tutorials/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Blender tutorials</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="web" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-blue text-white"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#browser"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">Web development</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who want to build things anyone with a browser can use.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">A site for a real person: a friend&#x27;s business, a lecturer, the club.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">HTML and CSS: structure and layout</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">JavaScript: make pages do things</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">A framework (React) and a backend (Firebase)</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Deploy it and share the link</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://developer.mozilla.org/en-US/docs/Learn_web_development" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>MDN: Learn web development</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://www.theodinproject.com/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>The Odin Project</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://web.dev/learn" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>web.dev Learn</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://firebase.google.com/docs" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Firebase docs</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="mobile" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-green text-white"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#device-mobile"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">Mobile</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who want their work in someone&#x27;s pocket.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">A timetable or expense tracker you actually use.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Kotlin or Dart basics</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">Jetpack Compose (Android) or Flutter (both platforms)</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Store data and call an API</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Publish a release build</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://developer.android.com/courses/android-basics-compose/course" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Android Basics with Compose</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://docs.flutter.dev/get-started" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Flutter: get started</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://kotlinlang.org/docs/getting-started.html" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Kotlin docs</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="ai" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-yellow text-[#202124]"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#brain"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">AI and machine learning</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people curious about how machines learn, and how to build useful things with models.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">A study helper that summarises your own lecture notes.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Python and a bit of NumPy and pandas</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">Core ML ideas: training, overfitting, evaluation</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Build with a model API (Gemini)</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Train or fine-tune your own small model</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://developers.google.com/machine-learning/crash-course" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Google ML Crash Course</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Kaggle Learn</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://course.fast.ai/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Practical Deep Learning (fast.ai)</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://ai.google.dev/gemini-api/docs" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Gemini API docs</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="cloud" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-blue text-white"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#cloud-arrow-up"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">Cloud and DevOps</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who like making systems reliable, fast and cheap to run.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">Containerise a club project and deploy it on every push.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Linux and networking basics</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">Containers with Docker</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Deploy to a cloud (Cloud Run, Firebase Hosting)</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Automate it with CI/CD</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://cloud.google.com/learn/training" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Google Cloud training</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Docker: get started</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://roadmap.sh/devops" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>DevOps roadmap</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="design" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-red text-white"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#pen-nib"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">UI/UX design</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who notice when something is confusing and want to fix it.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">Redesign one painful student portal screen, then test it with five classmates.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Design basics: type, spacing, colour, hierarchy</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">Figma: components and prototypes</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Talk to users and test with them</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Hand off designs developers can build</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://m3.material.io/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Material Design 3</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://help.figma.com/hc/en-us/categories/360002051613" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Figma Learn</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://lawsofux.com/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Laws of UX</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://grow.google/certificates/ux-design/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Google UX Design Certificate</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="data" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-google-green text-white"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#chart-line-up"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">Data</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who like finding the story inside numbers.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">Analyse a public Zimbabwean dataset and publish what you found.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Spreadsheets properly</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">SQL</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Python with pandas</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Dashboards that answer one question each</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://sqlbolt.com/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>SQLBolt</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://www.kaggle.com/learn" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Kaggle Learn: Python and pandas</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://grow.google/certificates/data-analytics/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Google Data Analytics Certificate</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          <article id="security" class="scroll-mt-24 py-12 md:py-16 border-t border-brandBorder grid lg:grid-cols-[0.8fr_1.2fr] gap-8 lg:gap-14">
+            <div>
+              <span class="inline-grid place-items-center w-14 h-14 rounded-2xl bg-brandTextPrimary text-brandBgPrimary"><svg class="w-7 h-7 shrink-0" aria-hidden="true"><use href="/img/icons.svg#shield-check"></use></svg></span>
+              <h3 class="font-display font-extrabold text-3xl md:text-5xl leading-[0.95] mt-5">Cybersecurity</h3>
+              <p class="mt-4 text-brandTextSecondary text-lg leading-relaxed max-w-[40ch]">For people who like puzzles and figuring out how things break.</p>
+              <p class="mt-6 rounded-2xl bg-brandBgSecondary p-4"><span class="block font-mono text-xs text-brandTextSecondary">First project</span><span class="block font-semibold mt-1">Audit a club project for the OWASP Top 10 and fix what you find.</span></p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div><h4 class="font-semibold mb-2">Learn it in this order</h4><ol><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">1</span><span class="pt-1">Linux and networking</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">2</span><span class="pt-1">Web vulnerabilities: the OWASP Top 10</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">3</span><span class="pt-1">Capture-the-flag practice</span></li><li class="flex gap-4 py-3 border-b border-brandBorder last:border-0"><span class="font-display font-extrabold text-2xl text-brandTextSecondary w-6">4</span><span class="pt-1">Secure your own projects first</span></li></ol></div>
+              <div><h4 class="font-semibold mb-3">Free places to learn</h4><ul class="grid gap-2"><li><a href="https://tryhackme.com/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>TryHackMe</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://overthewire.org/wargames/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>OverTheWire</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>OWASP Top 10</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li><li><a href="https://grow.google/certificates/cybersecurity/" target="_blank" rel="noopener" class="flex items-center justify-between gap-3 rounded-2xl border border-brandBorder bg-brandBgTertiary px-4 py-3 font-semibold hover:border-brandTextPrimary"><span>Google Cybersecurity Certificate</span><svg class="w-4 h-4 shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-up-right"></use></svg></a></li></ul></div>
+            </div>
+          </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="rankings" class="scroll-mt-24 py-16 md:py-24 bg-brandBgSecondary">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+          <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] max-w-[18ch]">What the world's developer studies say.</h2>
+          <p class="mt-4 text-lg text-brandTextSecondary max-w-[60ch]">Popularity isn't the only reason to learn something, but it tells you where the jobs, tutorials and help are. Each chart links to its source.</p>
+          <div class="mt-10 grid gap-4 lg:grid-cols-3">
+            <figure class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 md:p-7">
+              <figcaption><h3 class="font-display font-bold text-xl leading-snug">Languages professional developers use most</h3><p class="mt-1 text-sm text-brandTextSecondary">Source: <a href="https://survey.stackoverflow.co/2025/technology/" target="_blank" rel="noopener" class="underline">Stack Overflow Developer Survey 2025</a></p></figcaption>
+              <ol class="rank-list scroll-reveal mt-5"><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:0">
+                <span class="text-sm font-medium truncate">JavaScript</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:100.0%; --i:0"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">66%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:1">
+                <span class="text-sm font-medium truncate">HTML/CSS</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:93.8%; --i:1"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">61.9%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:2">
+                <span class="text-sm font-medium truncate">SQL</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:88.8%; --i:2"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">58.6%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:3">
+                <span class="text-sm font-medium truncate">Python</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:87.7%; --i:3"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">57.9%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:4">
+                <span class="text-sm font-medium truncate">Bash/Shell</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:73.8%; --i:4"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">48.7%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:5">
+                <span class="text-sm font-medium truncate">TypeScript</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:66.1%; --i:5"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">43.6%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:6">
+                <span class="text-sm font-medium truncate">Java</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:44.5%; --i:6"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">29.4%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:7">
+                <span class="text-sm font-medium truncate">C#</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:42.1%; --i:7"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">27.8%</span></span>
+              </li></ol>
+            </figure>
+            <figure class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 md:p-7">
+              <figcaption><h3 class="font-display font-bold text-xl leading-snug">Languages people learning to code use most</h3><p class="mt-1 text-sm text-brandTextSecondary">Source: <a href="https://survey.stackoverflow.co/2025/technology/" target="_blank" rel="noopener" class="underline">Stack Overflow Developer Survey 2025</a></p></figcaption>
+              <ol class="rank-list scroll-reveal mt-5"><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:0">
+                <span class="text-sm font-medium truncate">Python</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:100.0%; --i:0"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">71.8%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:1">
+                <span class="text-sm font-medium truncate">HTML/CSS</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:92.8%; --i:1"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">66.6%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:2">
+                <span class="text-sm font-medium truncate">JavaScript</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:87.5%; --i:2"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">62.8%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:3">
+                <span class="text-sm font-medium truncate">C</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:66.9%; --i:3"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">48%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:4">
+                <span class="text-sm font-medium truncate">Bash/Shell</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:65.5%; --i:4"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">47%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:5">
+                <span class="text-sm font-medium truncate">SQL</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:63.2%; --i:5"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">45.4%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:6">
+                <span class="text-sm font-medium truncate">C++</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:62.1%; --i:6"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">44.6%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:7">
+                <span class="text-sm font-medium truncate">Java</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:56.8%; --i:7"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">40.8%</span></span>
+              </li></ol>
+            </figure>
+            <figure class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6 md:p-7">
+              <figcaption><h3 class="font-display font-bold text-xl leading-snug">Most popular languages worldwide, October 2026</h3><p class="mt-1 text-sm text-brandTextSecondary">Source: <a href="https://www.tiobe.com/tiobe-index/" target="_blank" rel="noopener" class="underline">TIOBE Index</a></p></figcaption>
+              <ol class="rank-list scroll-reveal mt-5"><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:0">
+                <span class="text-sm font-medium truncate">Python</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:100.0%; --i:0"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">19.23%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:1">
+                <span class="text-sm font-medium truncate">C</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:58.9%; --i:1"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">11.33%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:2">
+                <span class="text-sm font-medium truncate">C++</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:46.1%; --i:2"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">8.87%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:3">
+                <span class="text-sm font-medium truncate">Java</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:43.7%; --i:3"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">8.41%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:4">
+                <span class="text-sm font-medium truncate">C#</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:19.7%; --i:4"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">3.79%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:5">
+                <span class="text-sm font-medium truncate">JavaScript</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:14.4%; --i:5"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">2.77%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:6">
+                <span class="text-sm font-medium truncate">Visual Basic</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:11.4%; --i:6"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">2.2%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:7">
+                <span class="text-sm font-medium truncate">R</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:10.7%; --i:7"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">2.06%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:8">
+                <span class="text-sm font-medium truncate">SQL</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:10.2%; --i:8"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">1.97%</span></span>
+              </li><li class="grid grid-cols-[minmax(84px,30%)_1fr] gap-3 items-center py-1.5" style="--i:9">
+                <span class="text-sm font-medium truncate">Rust</span>
+                <span class="flex items-center gap-2 min-w-0"><span class="rank-bar block" style="width:7.5%; --i:9"></span><span class="text-sm tabular-nums text-brandTextSecondary shrink-0">1.44%</span></span>
+              </li></ol>
+            </figure>
+          </div>
+          <div class="mt-4 grid gap-4 lg:grid-cols-[1fr_1.2fr]">
+            <article class="rounded-3xl bg-google-blue text-white p-7 md:p-9 flex flex-col">
+              <p class="font-mono text-xs opacity-80">GitHub Octoverse 2025</p>
+              <p class="font-display font-extrabold text-3xl md:text-4xl leading-tight mt-3">TypeScript overtook Python and JavaScript to become the most used language on GitHub in August 2025.</p>
+              <p class="mt-4 opacity-90 leading-relaxed">It reached about 2.6 million monthly contributors, up 66% in a year. GitHub links the rise to AI-assisted coding, where types catch the assistant's mistakes early.</p>
+              <a href="https://github.blog/news-insights/octoverse/octoverse-a-new-developer-joins-github-every-second-as-ai-leads-typescript-to-1/" target="_blank" rel="noopener" class="mt-auto pt-6 font-semibold underline">Read the report</a>
+            </article>
+            <article class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-7 md:p-9">
+              <h3 class="font-display font-bold text-2xl">Fastest-growing jobs to 2030</h3>
+              <p class="mt-1 text-sm text-brandTextSecondary">Source: <a href="https://www.weforum.org/publications/the-future-of-jobs-report-2025/" target="_blank" rel="noopener" class="underline">World Economic Forum, Future of Jobs Report 2025</a>, a survey of over 1,000 employers. Tech roles from the top of the list.</p>
+              <ol class="mt-4 grid sm:grid-cols-2 gap-x-6"><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">1</span><span class="font-semibold">Big data specialists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">2</span><span class="font-semibold">FinTech engineers</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">3</span><span class="font-semibold">AI and machine learning specialists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">4</span><span class="font-semibold">Software and applications developers</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">5</span><span class="font-semibold">Security management specialists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">6</span><span class="font-semibold">Data warehousing specialists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">7</span><span class="font-semibold">Autonomous and electric vehicle specialists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">8</span><span class="font-semibold">UI and UX designers</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">9</span><span class="font-semibold">Internet of Things specialists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">10</span><span class="font-semibold">Data analysts and scientists</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">11</span><span class="font-semibold">Information security analysts</span></li><li class="flex items-baseline gap-4 py-3 border-b border-brandBorder"><span class="font-display font-extrabold text-2xl w-9 text-google-blue tabular-nums">12</span><span class="font-semibold">DevOps engineers</span></li></ol>
+            </article>
+          </div>
+          <p class="mt-6 text-sm text-brandTextSecondary max-w-[70ch]">The Stack Overflow survey asks developers what they used in the past year. TIOBE measures search-engine popularity. Octoverse counts activity on GitHub. They disagree because they measure different things, and that's useful: Python dominates learning and AI, JavaScript and TypeScript run the web.</p>
+        </div>
+      </section>
+
+      <section id="practices" class="py-16 md:py-24">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+          <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95] max-w-[16ch]">Habits of people who ship.</h2>
+          <ul class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Commit small, commit often</p><p class="mt-2 text-brandTextSecondary leading-relaxed">One change per commit with a message that says why. Future you will thank you.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Write the README first</p><p class="mt-2 text-brandTextSecondary leading-relaxed">What it is, how to run it, a screenshot. Half of judges and recruiters read nothing else.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Never commit secrets</p><p class="mt-2 text-brandTextSecondary leading-relaxed">API keys and passwords go in environment variables, not code. Leaked keys get abused within minutes.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Test the part that would hurt</p><p class="mt-2 text-brandTextSecondary leading-relaxed">You don&#x27;t need 100% coverage. Test the logic that loses data or money if it breaks.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Build for slow phones</p><p class="mt-2 text-brandTextSecondary leading-relaxed">Most of your users are on mobile data. Smaller images, less JavaScript, works offline where it can.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Make it accessible</p><p class="mt-2 text-brandTextSecondary leading-relaxed">Real labels, enough contrast, works with a keyboard. It&#x27;s also what makes it usable for everyone else.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Review code kindly</p><p class="mt-2 text-brandTextSecondary leading-relaxed">Ask questions instead of giving orders. Everyone on the team is learning.</p></li><li class="rounded-3xl border border-brandBorder p-6"><p class="font-display font-bold text-xl">Read the error message</p><p class="mt-2 text-brandTextSecondary leading-relaxed">All of it, slowly, top to bottom. Then search it. Most bugs are explained in the first line.</p></li></ul>
+        </div>
+      </section>
+
+      <section id="packs" class="scroll-mt-24 py-16 md:py-24 bg-brandBgSecondary">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8">
+          <h2 class="font-display font-extrabold text-4xl md:text-6xl leading-[0.95]">Free stuff for students.</h2>
+          <p class="mt-4 text-lg text-brandTextSecondary max-w-[56ch]">Your student email unlocks cloud credits, pro tools and courses. Claim these before you graduate.</p>
+          <div class="mt-10 grid gap-3 md:grid-cols-2 lg:grid-cols-3" data-slot="packs"></div>
+        </div>
+      </section>
+
+      <section class="py-16 md:py-24">
+        <div class="max-w-[1200px] mx-auto px-4 md:px-8 grid md:grid-cols-2 gap-4">
+          <a href="/blog" class="group rounded-3xl bg-brandTextPrimary text-brandBgPrimary p-8 md:p-10 flex flex-col min-h-[240px]"><span class="font-display font-extrabold text-3xl md:text-4xl leading-tight">Keep up with what's new.</span><span class="mt-3 opacity-75">The blog pulls the week's best articles for every path.</span><span class="mt-auto pt-6 inline-flex items-center gap-2 font-semibold">Read the blog <svg class="w-4 h-4 btn-arrow shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-right"></use></svg></span></a>
+          <a href="/events" class="group rounded-3xl bg-google-red text-white p-8 md:p-10 flex flex-col min-h-[240px]"><span class="font-display font-extrabold text-3xl md:text-4xl leading-tight">Learn it with people.</span><span class="mt-3 opacity-90">Every session is free, and the slides stay online after.</span><span class="mt-auto pt-6 inline-flex items-center gap-2 font-semibold">See sessions <svg class="w-4 h-4 btn-arrow shrink-0" aria-hidden="true"><use href="/img/icons.svg#arrow-right"></use></svg></span></a>
+        </div>
+      </section>
+    </main>
+    <!-- footer:start -->
+    <footer class="relative border-t border-brandBorder bg-brandBgPrimary overflow-hidden">
+      <div class="max-w-[1200px] mx-auto px-4 md:px-8 pt-16 md:pt-24">
+        <div class="grid gap-12 lg:grid-cols-[1.3fr_1fr]">
+          <div>
+            <p class="font-display font-extrabold text-4xl sm:text-5xl md:text-6xl leading-[0.92] max-w-[12ch]">Come build something with us.</p>
+            <div class="mt-8 flex flex-wrap gap-2">
+              <button type="button" data-open-modal="join" class="btn-press bg-google-blue text-white font-semibold px-6 py-3.5 rounded-full hover:bg-google-blue-dark">Join the club</button>
+              <a href="https://chat.whatsapp.com/HMTLxxUu00V3GZ6SEZjxdy" target="_blank" rel="noopener" class="btn-press inline-flex items-center gap-2 border border-brandBorder font-semibold px-5 py-3.5 rounded-full hover:border-brandTextPrimary"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#whatsapp-logo"></use></svg> WhatsApp</a>
+            </div>
+          </div>
+          <div>
+            <p class="font-display font-bold text-xl">One email a week</p>
+            <p class="text-brandTextSecondary mt-1">New sessions, slides from the last one, and openings for students.</p>
+            <form data-form="subscribe" class="mt-4 flex flex-col sm:flex-row gap-2" novalidate>
+              <label for="footer-email" class="sr-only">Email address</label>
+              <input id="footer-email" type="email" name="email" required autocomplete="email" placeholder="you@africau.edu" class="field !rounded-full flex-1 min-w-0" />
+              <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+              <button type="submit" class="btn-press rounded-full px-6 py-3 font-semibold bg-brandTextPrimary text-brandBgPrimary">Subscribe</button>
+            </form>
+            <p data-form-status class="mt-2 text-sm min-h-5" role="status"></p>
+          </div>
+        </div>
+        <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-8 text-[15px]">
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Learn</p>
+            <ul class="space-y-2.5"><li><a href="/learn" class="hover:text-google-blue">Learning paths</a></li><li><a href="/learn#rankings" class="hover:text-google-blue">Tech rankings</a></li><li><a href="/learn#packs" class="hover:text-google-blue">Student packs</a></li><li><a href="/blog" class="hover:text-google-blue">Blog</a></li></ul>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Club</p>
+            <ul class="space-y-2.5"><li><a href="/events" class="hover:text-google-blue">Events</a></li><li><a href="/projects" class="hover:text-google-blue">Projects</a></li><li><a href="/people" class="hover:text-google-blue">People</a></li><li><a href="/#apply" class="hover:text-google-blue">Lead a path</a></li></ul>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Find us</p>
+            <ul class="space-y-2.5"><li><a href="https://discord.gg/5gepG5Mj" target="_blank" rel="noopener" class="hover:text-google-blue">Discord</a></li><li><a href="https://www.instagram.com/au_gdsc" target="_blank" rel="noopener" class="hover:text-google-blue">Instagram</a></li><li><a href="https://www.tiktok.com/@au_gdsc" target="_blank" rel="noopener" class="hover:text-google-blue">TikTok</a></li><li><a href="https://www.linkedin.com/in/google-developer-group-on-campus-au-50317828b" target="_blank" rel="noopener" class="hover:text-google-blue">LinkedIn</a></li></ul>
+          </div>
+          <div>
+            <p class="font-mono text-xs text-brandTextSecondary mb-4">Elsewhere</p>
+            <ul class="space-y-2.5"><li><a href="https://github.com/GdgAu23" target="_blank" rel="noopener" class="hover:text-google-blue">GitHub</a></li><li><a href="https://gdg.community.dev/" target="_blank" rel="noopener" class="hover:text-google-blue">GDG on Bevy</a></li><li><a href="https://developers.google.com/" target="_blank" rel="noopener" class="hover:text-google-blue">Google Developers</a></li><li><a href="https://www.africau.edu/" target="_blank" rel="noopener" class="hover:text-google-blue">Africa University</a></li></ul>
+          </div>
+        </div>
+        <div class="mt-16 flex flex-col sm:flex-row justify-between gap-2 text-[13px] text-brandTextSecondary">
+          <p>&copy; <span data-year>2026</span> GDG on Campus Africa University. Part of Google Developer Groups.</p>
+          <p>Made by students in Mutare, Zimbabwe.</p>
+        </div>
+      </div>
+      <p class="wordmark font-display font-extrabold select-none mt-8 -mb-[0.12em] px-2 whitespace-nowrap text-center" aria-hidden="true"><span class="text-google-blue">G</span><span class="text-google-red">D</span><span class="text-google-yellow">G</span><span class="text-google-green">&nbsp;AU</span></p>
+    </footer>
+    <!-- footer:end -->
+    <!-- modals:start -->
+    <div id="join-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="join-title" hidden>
+      <div class="modal-content p-6 md:p-8">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="join-title" class="font-display font-extrabold text-3xl">Join GDG Africa University</h2>
+            <p class="mt-2 text-brandTextSecondary text-sm">Free, for every faculty and every level. You'll get a welcome email with next steps.</p>
+          </div>
+          <button type="button" data-close-modal class="w-10 h-10 shrink-0 grid place-items-center rounded-full hover:bg-brandBgSecondary" aria-label="Close"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+        </div>
+        <form data-form="join" class="mt-6 space-y-4" novalidate>
+          <div><label class="label" for="j-name">Full name</label><input id="j-name" name="name" required autocomplete="name" placeholder="e.g. Tendai Moyo" class="field" /></div>
+          <div><label class="label" for="j-email">Email</label><input id="j-email" type="email" name="email" required autocomplete="email" placeholder="you@africau.edu" class="field" /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="label" for="j-year">Year</label>
+              <select id="j-year" name="academic_year" class="field"><option value="">Select</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>Postgraduate</option><option>Alumni</option></select></div>
+            <div><label class="label" for="j-dept">Department</label><input id="j-dept" name="department" placeholder="e.g. Computer Science" class="field" /></div>
+          </div>
+          <div><label class="label" for="j-int">Paths you're curious about</label><input id="j-int" name="interests" placeholder="e.g. Game dev, UI/UX, AI" class="field" /></div>
+          <div><label class="label" for="j-mot">What do you want to build? <span class="font-normal text-brandTextSecondary">(optional)</span></label><textarea id="j-mot" name="motivation" rows="3" placeholder="Anything goes, even 'no idea yet'" class="field"></textarea></div>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <button type="submit" class="btn-press w-full py-3.5 bg-google-blue text-white rounded-full font-semibold hover:bg-google-blue-dark">Join the club</button>
+          <p data-form-status class="text-center text-sm font-semibold min-h-5" role="status"></p>
+        </form>
+      </div>
+    </div>
+    <div id="collab-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="collab-title" hidden>
+      <div class="modal-content p-6 md:p-8">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="collab-title" class="font-display font-extrabold text-3xl">Join this build</h2>
+            <p class="mt-2 text-brandTextSecondary text-sm" data-collab-desc>Lend your skills to a team and help build something real.</p>
+          </div>
+          <button type="button" data-close-modal class="w-10 h-10 shrink-0 grid place-items-center rounded-full hover:bg-brandBgSecondary" aria-label="Close"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+        </div>
+        <form data-form="collab" class="mt-6 space-y-4" novalidate>
+          <input type="hidden" name="kind" value="collab" /><input type="hidden" name="project_id" />
+          <div><label class="label" for="c-name">Your name</label><input id="c-name" name="name" required autocomplete="name" class="field" /></div>
+          <div><label class="label" for="c-email">Email</label><input id="c-email" type="email" name="email" required autocomplete="email" class="field" /></div>
+          <div><label class="label" for="c-role">What can you help with?</label><input id="c-role" name="role" placeholder="e.g. Flutter, UI design, pixel art, data" class="field" /></div>
+          <div><label class="label" for="c-details">Why this project?</label><textarea id="c-details" name="details" rows="3" class="field"></textarea></div>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <button type="submit" class="btn-press w-full py-3.5 bg-google-blue text-white rounded-full font-semibold hover:bg-google-blue-dark">Send to the team</button>
+          <p data-form-status class="text-center text-sm font-semibold min-h-5" role="status"></p>
+        </form>
+      </div>
+    </div>
+    <button type="button" id="back-to-top" class="fixed bottom-5 right-5 z-30 w-12 h-12 grid place-items-center rounded-full bg-brandTextPrimary text-brandBgPrimary opacity-0 invisible transition-opacity" aria-label="Back to top"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#arrow-up"></use></svg></button>
+    <!-- modals:end -->
+    <script type="module" src="/js/site.js"></script>
+  </body>
+</html>

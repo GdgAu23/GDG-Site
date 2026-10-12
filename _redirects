@@ -1,0 +1,8 @@
+# Old URLs from the previous site -> new homes (301 keeps search ranking)
+/plan.html        /events      301
+/plan             /events      301
+/resources.html   /learn#packs 301
+/resources        /learn#packs 301
+/project.html     /projects    301
+/project          /projects    301
+/index.html       /            301

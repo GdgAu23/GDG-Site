@@ -1,857 +1,477 @@
-import { supabase } from './supabase-config.js';
-import { BlogAPI, ProjectsAPI, TeamAPI, EventsAPI, TestimonialsAPI, NewsletterAPI, ApplicationsAPI, MembershipAPI, SemesterPlanAPI, NewslettersArchiveAPI, AuthAPI, ImageAPI } from './api.js';
+// Admin dashboard. Every content type is described by a schema in SCHEMAS; one generic
+// form builder renders editors from it. Add a field: add it here AND to functions/_lib/admin-tables.js.
 
-// --- Global UI Elements ---
-const loginModal = document.getElementById('login-modal');
-const loginForm = document.getElementById('login-form');
-const loginError = document.getElementById('login-error');
-const logoutBtn = document.getElementById('logout-btn');
-const tabBtns = document.querySelectorAll('.tab-btn');
-const mobileTabSelect = document.getElementById('mobile-tab-select');
-const pageTitle = document.getElementById('page-title');
-const pageSubtitle = document.getElementById('page-subtitle');
-const contentContainer = document.getElementById('content-container');
-const addNewBtn = document.getElementById('addNewBtn'); // Wait, button id is add-new-btn
-const addNewBtnReal = document.getElementById('add-new-btn');
+const $ = (s, el = document) => el.querySelector(s);
+const $$ = (s, el = document) => [...el.querySelectorAll(s)];
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const icon = (n, cls = 'w-4 h-4') => `<svg class="${cls}" aria-hidden="true"><use href="/img/icons.svg#${n}"></use></svg>`;
+const SITE = location.origin;
 
-const editModal = document.getElementById('edit-modal');
-const editModalContent = document.getElementById('edit-modal-content');
-const closeModalBtn = document.getElementById('close-modal-btn');
-const cancelModalBtn = document.getElementById('cancel-modal-btn');
-const editForm = document.getElementById('edit-form');
-const formFields = document.getElementById('form-fields');
-const modalTitle = document.getElementById('modal-title');
-const saveModalBtn = document.getElementById('save-modal-btn');
+// ── API ──
+async function api(path, opts = {}) {
+  const isJson = opts.body && typeof opts.body === 'string';
+  const res = await fetch(`/api/admin/${path}`, { ...opts, headers: { 'x-gdg-admin': '1', ...(isJson ? { 'content-type': 'application/json' } : {}), ...opts.headers } });
+  if (res.status === 401) { showSignin('Your session ended. Sign in again.'); throw new Error('Signed out'); }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+  return data;
+}
+function toast(msg, bad = false) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.toggle('!bg-google-red', bad);
+  t.classList.toggle('!text-white', bad);
+  t.classList.remove('opacity-0');
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => t.classList.add('opacity-0'), 2600);
+}
 
-// --- New Dashboard Elements ---
-const tableSearch = document.getElementById('table-search');
-const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
-const sidebar = document.querySelector('aside');
-const adminUserEmail = document.getElementById('admin-user-email');
-const toastContainer = document.getElementById('toast-container');
-const confirmModal = document.getElementById('confirm-modal');
-const confirmModalContent = document.getElementById('confirm-modal-content');
-const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
-const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+// ── Schemas ──
+const PATHS = [['', 'None'], ['web', 'Web'], ['mobile', 'Mobile'], ['game', 'Game dev'], ['ai', 'AI and ML'], ['cloud', 'Cloud'], ['design', 'UI/UX'], ['data', 'Data'], ['security', 'Security']];
+const KINDS = [['workshop', 'Workshop'], ['study-jam', 'Study jam'], ['talk', 'Talk'], ['hackathon', 'Hackathon'], ['community', 'Community']];
+const MD_HELP = 'Markdown: **bold**, *italic*, - lists, ## headings, [link text](https://...)';
 
-// --- State ---
-let currentTab = 'blog';
-let dataList = [];
-let editingId = null; // null if adding new
-let confirmResolve = null; // for custom confirm promise
-let quillInstances = {}; // to hold Quill editor instances
-
-// --- Configuration per Tab ---
-const tableConfigs = {
-    blog: {
-        title: 'Manage Blog',
-        subtitle: 'Add or edit blog posts for the site.',
-        table: 'blog',
-        hasPreview: true,
-        fields: [
-            { name: 'title', label: 'Title', type: 'text', required: true },
-            { name: 'author', label: 'Author', type: 'text', required: true },
-            { name: 'content', label: 'Content (Rich Text)', type: 'textarea', required: true, isHtml: true },
-            { name: 'image', label: 'Cover Image', type: 'file', required: false, isImage: true }
-        ],
-        displayCols: ['title', 'author', 'created_at']
-    },
-    projects: {
-        title: 'Manage Projects',
-        subtitle: 'Showcase projects and student startups built by members.',
-        table: 'projects',
-        hasPreview: true,
-        fields: [
-            { name: 'title', label: 'Project / Startup Title', type: 'text', required: true },
-            { name: 'description', label: 'Description', type: 'textarea', required: true },
-            { name: 'tags', label: 'Tags (comma separated)', type: 'text', required: false },
-            { name: 'link', label: 'Project / Demo Link', type: 'url', required: false },
-            { name: 'github', label: 'GitHub Repository', type: 'url', required: false },
-            { name: 'image', label: 'Project Image', type: 'file', required: false, isImage: true },
-            { name: 'status', label: 'Status', type: 'select', required: false, options: ['approved', 'pending'] },
-            { name: 'is_startup', label: 'Is a Student Startup?', type: 'select', required: false, options: ['false', 'true'] },
-            { name: 'needs_help', label: 'Seeking Collaborators?', type: 'select', required: false, options: ['false', 'true'] },
-            { name: 'help_description', label: 'Collaboration Description', type: 'textarea', required: false }
-        ],
-        displayCols: ['title', 'link']
-    },
-    team: {
-        title: 'Manage Core Team',
-        subtitle: 'Update members of the core team. Mark a member as the weekly Spotlight to feature them on the homepage.',
-        table: 'team',
-        hasPreview: true,
-        fields: [
-            { name: 'name', label: 'Full Name', type: 'text', required: true },
-            { name: 'role', label: 'Role', type: 'select', required: true, options: [
-                'Chapter Lead', 'Technical Lead', 'Design Lead', 'Community Lead', 'Events Lead', 'Content Lead', 'Member'
-            ] },
-            { name: 'bio', label: 'Bio (e.g. Computer Science • Class of 2026)', type: 'text', required: false },
-            { name: 'linkedin', label: 'LinkedIn URL', type: 'url', required: false },
-            { name: 'github', label: 'GitHub URL', type: 'url', required: false },
-            { name: 'image', label: 'Profile Picture', type: 'file', required: false, isImage: true },
-            { name: 'is_spotlight', label: 'Feature as Member of the Week?', type: 'select', required: false, options: ['false', 'true'] },
-            { name: 'spotlight_date', label: 'Spotlight Date (YYYY-MM-DD)', type: 'date', required: false },
-            { name: 'spotlight_quote', label: 'Spotlight Quote', type: 'textarea', required: false },
-            { name: 'spotlight_project', label: 'Spotlight Project Name', type: 'text', required: false }
-        ],
-        displayCols: ['name', 'role', 'is_spotlight']
-    },
-    spotlight: {
-        title: 'Member of the Week',
-        subtitle: 'Feature ANY club member — they don\'t need to be on the core team. The most recent active member shows on the homepage.',
-        table: 'spotlight_members',
-        hasPreview: true,
-        fields: [
-            { name: 'name', label: 'Full Name', type: 'text', required: true },
-            { name: 'role', label: 'Role / Year (e.g. Club Member, 2nd Year CS)', type: 'text', required: false },
-            { name: 'bio', label: 'Bio', type: 'text', required: false },
-            { name: 'image', label: 'Profile Picture', type: 'file', required: false, isImage: true },
-            { name: 'linkedin', label: 'LinkedIn URL', type: 'url', required: false },
-            { name: 'github', label: 'GitHub URL', type: 'url', required: false },
-            { name: 'spotlight_quote', label: 'Spotlight Quote', type: 'textarea', required: false },
-            { name: 'spotlight_project', label: 'Spotlight Project Name', type: 'text', required: false },
-            { name: 'spotlight_date', label: 'Spotlight Date (YYYY-MM-DD)', type: 'date', required: false },
-            { name: 'is_active', label: 'Active (shows on homepage)?', type: 'select', required: false, options: ['false', 'true'] }
-        ],
-        displayCols: ['name', 'role', 'is_active', 'spotlight_date']
-    },
-    events: {
-        title: 'Manage Events',
-        subtitle: 'Update upcoming and past events. Events auto-pulled from the GDG community site arrive as pending — approve the good ones.',
-        table: 'events',
-        hasPreview: true,
-        fields: [
-            { name: 'title', label: 'Event Title', type: 'text', required: true },
-            { name: 'date', label: 'Event Date (YYYY-MM-DD)', type: 'date', required: true },
-            { name: 'description', label: 'Description', type: 'textarea', required: true },
-            { name: 'link', label: 'Event Link (Bevy)', type: 'url', required: false },
-            { name: 'image', label: 'Event Banner', type: 'file', required: false, isImage: true },
-            { name: 'location_type', label: 'Format', type: 'select', required: false, options: ['online', 'inperson'] },
-            { name: 'location', label: 'Location / Venue (e.g. Zoom, Africa University, Harare)', type: 'text', required: false },
-            { name: 'status', label: 'Status', type: 'select', required: false, options: ['approved', 'pending'] },
-            { name: 'source_url', label: 'Source URL (GDG)', type: 'url', required: false }
-        ],
-        displayCols: ['title', 'date', 'location_type', 'status']
-    },
-    schedule: {
-        title: 'Manage Schedule',
-        subtitle: 'Add or edit activities in the Semester Plan timeline shown on the homepage and the full plan page.',
-        table: 'semester_plan',
-        hasPreview: true,
-        sortCol: 'date',
-        sortAsc: true,
-        fields: [
-            { name: 'title', label: 'Activity Title', type: 'text', required: true },
-            { name: 'date', label: 'Activity Date (YYYY-MM-DD)', type: 'date', required: true },
-            { name: 'week_number', label: 'Week Number', type: 'number', required: false },
-            { name: 'activity_type', label: 'Activity Type', type: 'select', required: true, options: ['Workshop', 'Community', 'Study Group', 'Hackathon', 'Talk', 'Other'] },
-            { name: 'description', label: 'Description', type: 'textarea', required: false },
-            { name: 'status', label: 'Status', type: 'select', required: false, options: ['upcoming', 'live', 'ongoing', 'completed'] }
-        ],
-        displayCols: ['title', 'date', 'activity_type', 'status']
-    },
-    testimonials: {
-        title: 'Manage Testimonials',
-        subtitle: 'Add quotes from members and partners.',
-        table: 'testimonials',
-        hasPreview: true,
-        fields: [
-            { name: 'name', label: 'Name', type: 'text', required: true },
-            { name: 'role', label: 'Role/Company', type: 'text', required: true },
-            { name: 'content', label: 'Testimonial', type: 'textarea', required: true },
-            { name: 'image', label: 'Profile Picture', type: 'file', required: false, isImage: true }
-        ],
-        displayCols: ['name', 'role']
-    },
-    applications: {
-        title: 'Lead Role Applications',
-        subtitle: 'View submissions from the application form.',
-        table: 'applications',
-        readonly: true,
-        allowDelete: true,
-        hasDetails: true,
-        fields: [
-            { name: 'name', label: 'Applicant Name', type: 'text' },
-            { name: 'email', label: 'Email Address', type: 'text' },
-            { name: 'role', label: 'Applied Role', type: 'text' },
-            { name: 'skills', label: 'Level and Skills', type: 'textarea' },
-            { name: 'created_at', label: 'Applied On', type: 'text' }
-        ],
-        displayCols: ['name', 'email', 'role', 'created_at']
-    },
-    membership: {
-        title: 'Membership Applications',
-        subtitle: 'Review general membership applications from the join form. Update their status after you reach out.',
-        table: 'membership_applications',
-        allowDelete: true,
-        hasDetails: true,
-        fields: [
-            { name: 'name', label: 'Applicant Name', type: 'text', required: true },
-            { name: 'email', label: 'Email Address', type: 'text', required: true },
-            { name: 'academic_year', label: 'Academic Year', type: 'text' },
-            { name: 'department', label: 'Department', type: 'text' },
-            { name: 'motivation', label: 'Motivation', type: 'textarea' },
-            { name: 'interests', label: 'Interests', type: 'textarea' },
-            { name: 'status', label: 'Status', type: 'select', options: ['pending', 'contacted', 'approved', 'declined'] }
-        ],
-        displayCols: ['name', 'email', 'department', 'status', 'created_at']
-    },
-    newsletter: {
-        title: 'Newsletter Subscribers',
-        subtitle: 'View and manage emails subscribed to the newsletter.',
-        table: 'newsletter_subscribers',
-        readonly: true,
-        allowDelete: true,
-        hasCompose: true,
-        fields: [],
-        displayCols: ['email', 'created_at']
-    },
-    resources: {
-        title: 'Student Resources',
-        subtitle: 'Edit the free tools and student packs shown on the homepage.',
-        table: 'resources',
-        fields: [
-            { name: 'title', label: 'Resource Name', type: 'text', required: true },
-            { name: 'description', label: 'Description', type: 'textarea', required: true },
-            { name: 'url', label: 'Link URL', type: 'url', required: false },
-            { name: 'badge', label: 'Badge (e.g. FREE, $200 FREE)', type: 'text', required: false },
-            { name: 'color_key', label: 'Color', type: 'select', required: false, options: ['blue', 'red', 'green', 'yellow', 'purple', 'orange'] },
-            { name: 'sort_order', label: 'Sort Order (lower = first)', type: 'number', required: false }
-        ],
-        displayCols: ['title', 'badge']
-    },
-    collab: {
-        title: 'Collaboration Applications',
-        subtitle: 'Review volunteers who want to help teams and startups. Update their status after you reach out.',
-        table: 'collab_applications',
-        allowDelete: true,
-        hasDetails: true,
-        fields: [
-            { name: 'name', label: 'Volunteer Name', type: 'text', required: true },
-            { name: 'email', label: 'Email Address', type: 'text', required: true },
-            { name: 'project_title', label: 'Project', type: 'text' },
-            { name: 'skills', label: 'Skills', type: 'textarea' },
-            { name: 'motivation', label: 'Motivation', type: 'textarea' },
-            { name: 'status', label: 'Status', type: 'select', options: ['pending', 'contacted', 'approved', 'declined'] }
-        ],
-        displayCols: ['name', 'email', 'project_title', 'status', 'created_at']
-    },
-    comments: {
-        title: 'Comments & Q&A',
-        subtitle: 'Moderate reader comments and Q&A on blog posts. Mark responses as team answers, hide spam, or delete.',
-        table: 'post_comments',
-        allowDelete: true,
-        hasDetails: true,
-        fields: [
-            { name: 'name', label: 'Commenter Name', type: 'text' },
-            { name: 'post_id', label: 'Post ID', type: 'text' },
-            { name: 'content', label: 'Comment / Question', type: 'textarea' },
-            { name: 'is_question', label: 'Is a Question', type: 'select', options: ['false', 'true'] },
-            { name: 'is_answer', label: 'Is a Team Answer', type: 'select', options: ['false', 'true'] },
-            { name: 'status', label: 'Status', type: 'select', options: ['approved', 'pending', 'hidden'] },
-            { name: 'created_at', label: 'Date', type: 'text' }
-        ],
-        displayCols: ['name', 'content', 'status', 'created_at']
-    }
+const SCHEMAS = {
+  events: {
+    label: 'Events', one: 'event', view: (r) => `/events/${r.slug}`,
+    fields: [
+      { k: 'title', label: 'Title', req: true },
+      { k: 'starts_at', type: 'when', label: 'Date and start time', req: true, help: 'Leave the time empty if it is not set yet. Times are Harare time.' },
+      { k: 'ends_at', type: 'when', label: 'End (optional)' },
+      { k: 'kind', type: 'select', label: 'Type', options: KINDS },
+      { k: 'path', type: 'select', label: 'Learning path', options: PATHS },
+      { k: 'location', label: 'Location', placeholder: 'e.g. Africa University, Room 12 or Google Meet' },
+      { k: 'online', type: 'check', label: 'Online or hybrid' },
+      { k: 'register_url', type: 'url', label: 'Registration link', placeholder: 'https://gdg.community.dev/...' },
+      { k: 'summary', type: 'textarea', rows: 2, label: 'Summary', help: 'One or two sentences. Shown on cards, in WhatsApp shares and on Google.' },
+      { k: 'materials', type: 'materials', label: 'Materials students can open', help: 'Slides, code, recordings, docs. Google Slides links get an in-page viewer.' },
+      { k: 'people', type: 'people', label: 'People', roles: ['Speaker', 'Organiser', 'Mentor', 'Winner', 'Volunteer'], help: 'Shows on the event and on each person’s profile.' },
+      { k: 'body', type: 'textarea', rows: 8, label: 'Agenda, prep or recap', help: MD_HELP },
+      { k: 'cover', type: 'image', label: 'Cover image' },
+      { k: 'status', type: 'select', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft (hidden)'], ['cancelled', 'Cancelled']] },
+    ],
+  },
+  projects: {
+    label: 'Projects', one: 'project', view: (r) => `/projects/${r.slug}`,
+    fields: [
+      { k: 'title', label: 'Title', req: true },
+      { k: 'summary', type: 'textarea', rows: 2, label: 'Summary', help: 'One or two sentences.' },
+      { k: 'people', type: 'people', label: 'Team', roles: ['Founder', 'Lead', 'Developer', 'Designer', 'Contributor', 'Mentor'] },
+      { k: 'story', type: 'textarea', rows: 10, label: 'The story', help: `The problem, how it was built, what's next. ${MD_HELP}` },
+      { k: 'tags', label: 'Tags', placeholder: 'Flutter, Firebase, AI' },
+      { k: 'path', type: 'select', label: 'Main path', options: PATHS },
+      { k: 'image', type: 'image', label: 'Image' },
+      { k: 'demo_url', type: 'url', label: 'Live link' },
+      { k: 'repo_url', type: 'url', label: 'Code link' },
+      { k: 'event_id', type: 'event', label: 'Started at an event (optional)' },
+      { k: 'is_startup', type: 'check', label: 'Student startup' },
+      { k: 'needs_help', type: 'check', label: 'Looking for teammates' },
+      { k: 'help_text', type: 'textarea', rows: 2, label: 'Who do they need?' },
+      { k: 'status', type: 'select', label: 'Status', options: [['published', 'Published'], ['draft', 'Draft (hidden)']] },
+    ],
+  },
+  people: {
+    label: 'People', one: 'person', view: (r) => `/people/${r.slug}`,
+    fields: [
+      { k: 'name', label: 'Name', req: true },
+      { k: 'headline', label: 'Headline', placeholder: 'Computer Science, class of 2027' },
+      { k: 'core_role', label: 'Core team role', placeholder: 'Leave empty unless they are on the core team', help: 'Filled in = shown in "The core team" on the homepage.' },
+      { k: 'sort', type: 'number', label: 'Order on core team', help: 'Lower numbers first.' },
+      { k: 'image', type: 'image', label: 'Photo' },
+      { k: 'bio', type: 'textarea', rows: 3, label: 'Short bio' },
+      { k: 'path', type: 'select', label: 'Main path', options: PATHS },
+      { k: 'github', type: 'url', label: 'GitHub' },
+      { k: 'linkedin', type: 'url', label: 'LinkedIn' },
+      { k: 'website', type: 'url', label: 'Website' },
+      { k: 'is_spotlight', type: 'check', label: 'Member of the week', help: 'The most recently saved spotlight person is featured on the homepage.' },
+      { k: 'spotlight_quote', type: 'textarea', rows: 2, label: 'Spotlight quote' },
+    ],
+  },
+  posts: {
+    label: 'Blog', one: 'post', view: (r) => `/blog/${r.slug}`,
+    fields: [
+      { k: 'title', label: 'Title', req: true },
+      { k: 'excerpt', type: 'textarea', rows: 2, label: 'Excerpt' },
+      { k: 'body', type: 'textarea', rows: 16, label: 'Post', req: true, help: MD_HELP },
+      { k: 'author_id', type: 'person', label: 'Author' },
+      { k: 'cover', type: 'image', label: 'Cover image' },
+      { k: 'tags', label: 'Tags' },
+      { k: 'status', type: 'select', label: 'Status', options: [['draft', 'Draft'], ['published', 'Published']] },
+      { k: 'published_at', type: 'when', label: 'Publish date', help: 'Set automatically when first published.' },
+    ],
+  },
+  resources: {
+    label: 'Packs', one: 'pack',
+    fields: [
+      { k: 'title', label: 'Name', req: true },
+      { k: 'url', type: 'url', label: 'Link', req: true },
+      { k: 'badge', label: 'Badge', placeholder: 'Free, Credit...' },
+      { k: 'description', type: 'textarea', rows: 2, label: 'What students get' },
+      { k: 'sort', type: 'number', label: 'Order' },
+    ],
+  },
 };
 
-// --- Authentication ---
-async function checkAuth() {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-        loginModal.classList.add('hidden');
-        if (adminUserEmail) adminUserEmail.textContent = session.user.email;
-        loadTabData(currentTab);
-        loadDashboardStats();
-    } else {
-        loginModal.classList.remove('hidden');
-    }
+const TABS = [['overview', 'Overview'], ['events', 'Events'], ['projects', 'Projects'], ['people', 'People'], ['posts', 'Blog'], ['resources', 'Packs'], ['inbox', 'Inbox']];
+const cache = {};
+let me = null;
+
+// ── Auth ──
+async function boot() {
+  const s = await fetch('/api/admin/session').then(r => r.json()).catch(() => ({}));
+  me = s;
+  if (s.email) return showApp();
+  showSignin();
+}
+function showSignin(msg = '') {
+  $('#app').hidden = true;
+  $('#signin').hidden = false;
+  $('#signin-msg').textContent = msg;
+  $('#dev-login').hidden = !me?.devLogin;
+  if (!me?.clientId) {
+    if (!me?.devLogin) $('#signin-msg').textContent = 'Google sign-in is not configured yet: set GOOGLE_CLIENT_ID (see README).';
+    return;
+  }
+  const s = document.createElement('script');
+  s.src = 'https://accounts.google.com/gsi/client';
+  s.onload = () => {
+    google.accounts.id.initialize({ client_id: me.clientId, callback: ({ credential }) => signIn({ credential }), ux_mode: 'popup' });
+    google.accounts.id.renderButton($('#google-btn'), { theme: 'outline', size: 'large', shape: 'pill', width: 320, text: 'signin_with' });
+  };
+  document.head.appendChild(s);
+}
+async function signIn(body) {
+  const res = await fetch('/api/admin/session', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) { $('#signin-msg').textContent = data.error || 'Sign-in failed.'; return; }
+  me = { ...me, email: data.email };
+  showApp();
+}
+$('#dev-login').addEventListener('click', () => signIn({ dev: true }));
+$('#signout').addEventListener('click', async () => { await fetch('/api/admin/session', { method: 'DELETE' }); location.reload(); });
+
+function showApp() {
+  $('#signin').hidden = true;
+  $('#app').hidden = false;
+  $('#tabs').innerHTML = TABS.map(([id, label]) => `<a href="#${id}" data-tab="${id}" class="shrink-0 px-3.5 py-2 rounded-full text-sm font-semibold text-brandTextSecondary hover:text-brandTextPrimary">${label}</a>`).join('');
+  route();
+}
+addEventListener('hashchange', route);
+
+async function route() {
+  if ($('#app').hidden) return;
+  const tab = (location.hash.slice(1) || 'overview').split('/')[0];
+  $$('[data-tab]').forEach(a => {
+    const on = a.dataset.tab === tab;
+    a.classList.toggle('bg-brandTextPrimary', on);
+    a.classList.toggle('!text-brandBgPrimary', on);
+    a.setAttribute('aria-current', on ? 'page' : 'false');
+  });
+  $('#view').innerHTML = '<p class="text-brandTextSecondary">Loading...</p>';
+  try {
+    if (tab === 'overview') await renderOverview();
+    else if (tab === 'inbox') await renderInbox();
+    else if (SCHEMAS[tab]) await renderList(tab);
+  } catch (e) { if (e.message !== 'Signed out') $('#view').innerHTML = `<p class="text-google-red">${esc(e.message)}</p>`; }
 }
 
-loginForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    
-    loginError.classList.add('hidden');
-    const btn = loginForm.querySelector('button');
-    btn.textContent = "Signing in...";
-    btn.disabled = true;
+const load = async (table, force = false) => (cache[table] && !force ? cache[table] : (cache[table] = await api(table)));
+const fmtDate = (iso) => {
+  if (!iso) return '';
+  const timed = /T\d{2}:\d{2}/.test(iso);
+  const d = new Date(timed ? iso : `${iso}T12:00:00Z`);
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric', timeZone: timed ? 'Africa/Harare' : 'UTC' })
+    + (timed ? `, ${d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Africa/Harare' })}` : '');
+};
+const today = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Africa/Harare' });
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    
-    btn.textContent = "Sign In";
-    btn.disabled = false;
-
-    if (error) {
-        loginError.textContent = error.message;
-        loginError.classList.remove('hidden');
-    } else {
-        loginModal.classList.add('hidden');
-        checkAuth(); // refresh user email and stats
-    }
+// ── WhatsApp ──
+function whatsappText(events) {
+  if (events.length === 1) {
+    const e = events[0];
+    return [`*${e.title}*`, `📅 ${fmtDate(e.starts_at)}`, `📍 ${e.location || (e.online ? 'Online' : 'Africa University')}`, e.summary ? `\n${e.summary}` : '', `\nDetails and materials: ${SITE}/events/${e.slug}`].filter(Boolean).join('\n');
+  }
+  return [`*Coming up at GDG Africa University*`, ...events.map(e => `\n*${e.title}*\n📅 ${fmtDate(e.starts_at)}\n📍 ${e.location || (e.online ? 'Online' : 'Africa University')}\n${SITE}/events/${e.slug}`), `\nAll sessions and slides: ${SITE}/events`].join('\n');
+}
+const waLink = (text) => `https://wa.me/?text=${encodeURIComponent(text)}`;
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('[data-copy-text]');
+  if (!b) return;
+  try { await navigator.clipboard.writeText(b.dataset.copyText); toast('Copied. Paste it into the WhatsApp group.'); } catch { toast('Copy failed', true); }
 });
 
-logoutBtn.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    loginModal.classList.remove('hidden');
-});
+// ── Overview ──
+async function renderOverview() {
+  const [events, members, applications, subscribers] = await Promise.all([load('events', true), load('members', true), load('applications', true), load('subscribers', true)]);
+  const t = today();
+  const weekAhead = new Date(Date.now() + 7 * 864e5).toLocaleDateString('en-CA', { timeZone: 'Africa/Harare' });
+  const upcoming = events.filter(e => e.status !== 'draft' && e.starts_at.slice(0, 10) >= t).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
+  const thisWeek = upcoming.filter(e => e.starts_at.slice(0, 10) <= weekAhead);
+  const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString();
+  const stat = (n, label, href) => `<a href="${href}" class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-5 hover:border-brandTextPrimary"><p class="font-display font-extrabold text-4xl">${n}</p><p class="text-sm text-brandTextSecondary mt-1">${label}</p></a>`;
+  const digest = thisWeek.length ? whatsappText(thisWeek) : '';
+  const setup = [
+    [!!me.clientId, 'Google sign-in configured (GOOGLE_CLIENT_ID)'],
+    [!!me.mail, 'Welcome emails connected (Apps Script)'],
+  ];
 
-// --- Tab Navigation ---
-function switchTab(tabId) {
-    currentTab = tabId;
-
-    // Update Desktop Sidebar UI
-    tabBtns.forEach(btn => {
-        if (btn.dataset.tab === tabId) {
-            btn.classList.add('text-google-blue', 'bg-blue-50');
-            btn.classList.remove('text-gray-600', 'hover:bg-gray-50');
-        } else {
-            btn.classList.remove('text-google-blue', 'bg-blue-50');
-            btn.classList.add('text-gray-600', 'hover:bg-gray-50');
-        }
-    });
-    
-    // Update Mobile Select UI
-    mobileTabSelect.value = tabId;
-
-    // Update Header Content
-    const config = tableConfigs[tabId];
-    if (!config) {
-        // Stale cached admin.js (no config for this tab yet) — surface it instead of dying silently
-        pageTitle.textContent = 'Unknown Section';
-        pageSubtitle.textContent = `No admin configuration for "${tabId}".`;
-        contentContainer.innerHTML = `<div class="p-8 text-center text-red-500">No admin configuration found for "${tabId}".<br>This usually means an old admin script is cached — do a hard refresh (Ctrl/Cmd+Shift+R) to load the latest version.</div>`;
-        return;
-    }
-    pageTitle.textContent = config.title;
-    pageSubtitle.textContent = config.subtitle;
-    
-    if (config.readonly) {
-        addNewBtnReal.classList.add('hidden');
-    } else {
-        addNewBtnReal.classList.remove('hidden');
-    }
-
-    // Show compose button for newsletter
-    let composeBtn = document.getElementById('compose-newsletter-btn');
-    if (config.hasCompose) {
-        if (!composeBtn) {
-            composeBtn = document.createElement('button');
-            composeBtn.id = 'compose-newsletter-btn';
-            composeBtn.className = 'bg-google-green text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-green-600 transition-colors shadow-sm flex items-center gap-2';
-            composeBtn.innerHTML = `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> Compose Newsletter`;
-            composeBtn.addEventListener('click', composeNewsletter);
-            addNewBtnReal.parentElement.appendChild(composeBtn);
-        }
-        composeBtn.classList.remove('hidden');
-    } else if (composeBtn) {
-        composeBtn.classList.add('hidden');
-    }
-
-    loadTabData(tabId);
+  $('#view').innerHTML = `
+    <h1 class="font-display font-extrabold text-4xl md:text-5xl">Hi there.</h1>
+    <p class="text-brandTextSecondary mt-2">Signed in as ${esc(me.email)}.</p>
+    <div class="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3">
+      ${stat(upcoming.length, 'Upcoming events', '#events')}
+      ${stat(members.length, `Members (${members.filter(m => m.created_at > weekAgo).length} this week)`, '#inbox')}
+      ${stat(applications.filter(a => a.status === 'new').length, 'New applications', '#inbox')}
+      ${stat(subscribers.length, 'Newsletter subscribers', '#inbox')}
+    </div>
+    <div class="mt-8 grid lg:grid-cols-[1.3fr_1fr] gap-4">
+      <section class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6">
+        <h2 class="font-display font-bold text-2xl flex items-center gap-2">${icon('whatsapp-logo', 'w-6 h-6 text-google-green')} This week's WhatsApp post</h2>
+        ${digest ? `<pre class="mt-4 whitespace-pre-wrap text-sm bg-brandBgSecondary rounded-2xl p-4 max-h-72 overflow-auto">${esc(digest)}</pre>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <a href="${waLink(digest)}" target="_blank" rel="noopener" class="btn-press inline-flex items-center gap-2 bg-google-green text-white font-semibold px-5 py-3 rounded-full">${icon('whatsapp-logo')} Open in WhatsApp</a>
+            <button type="button" data-copy-text="${esc(digest)}" class="btn-press inline-flex items-center gap-2 border border-brandBorder font-semibold px-5 py-3 rounded-full">${icon('copy')} Copy text</button>
+          </div>
+          <p class="mt-3 text-sm text-brandTextSecondary">WhatsApp has no safe way for a website to post into a group by itself. One tap here opens it ready to send.</p>`
+          : `<p class="mt-3 text-brandTextSecondary">Nothing in the next 7 days. <a href="#events" class="text-google-blue font-semibold">Add an event</a>.</p>`}
+      </section>
+      <section class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-6">
+        <h2 class="font-display font-bold text-2xl">Setup</h2>
+        <ul class="mt-4 space-y-3">${setup.map(([ok, label]) => `<li class="flex items-center gap-3">${icon(ok ? 'check' : 'warning', `w-5 h-5 ${ok ? 'text-google-green' : 'text-google-red'}`)}<span>${label}</span></li>`).join('')}</ul>
+        <p class="mt-4 text-sm text-brandTextSecondary">Steps are in the README under "Admin setup".</p>
+      </section>
+    </div>`;
 }
 
-tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        switchTab(btn.dataset.tab);
-        // Close sidebar on mobile after clicking tab, but leave it open on desktop
-        if (window.innerWidth < 640) {
-            sidebar.classList.add('hidden');
-        }
-    });
-});
-
-mobileTabSelect.addEventListener('change', (e) => switchTab(e.target.value));
-
-if (mobileSidebarToggle && sidebar) {
-    mobileSidebarToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('hidden');
-    });
-}
-
-// --- Dashboard Stats ---
-async function loadDashboardStats() {
-    const getCount = async (table) => {
-        const { count, error } = await supabase.from(table).select('*', { count: 'exact', head: true });
-        return error ? 0 : count;
-    };
-    
-    document.getElementById('stat-blog').textContent = await getCount('blog');
-    document.getElementById('stat-projects').textContent = await getCount('projects');
-    document.getElementById('stat-team').textContent = await getCount('team');
-    document.getElementById('stat-events').textContent = await getCount('events');
-    document.getElementById('stat-schedule').textContent = await getCount('semester_plan');
-}
-
-// --- Dynamic Toasts and Modals ---
-function showToast(message, type = 'success') {
-    const toast = document.createElement('div');
-    const isError = type === 'error';
-    toast.className = `flexitems-center p-4 rounded-lg shadow-lg border-l-4 transform transition-all translate-y-full opacity-0 duration-300 ${isError ? 'bg-white dark:bg-gray-800 border-red-500 text-red-700' : 'bg-white dark:bg-gray-800 border-google-green text-gray-800 dark:text-gray-100'}`;
-    toast.innerHTML = `
-        <div class="flex items-center gap-3">
-            ${isError ? 
-              `<svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>` : 
-              `<svg class="w-5 h-5 text-google-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`
-            }
-            <p class="font-semibold text-sm">${message}</p>
+// ── Lists ──
+async function renderList(table) {
+  const s = SCHEMAS[table];
+  const rows = await load(table, true);
+  if (table === 'events' || table === 'projects' || table === 'posts') await load('people');
+  const t = today();
+  const line = (r) => {
+    if (table === 'events') {
+      const past = r.starts_at.slice(0, 10) < t;
+      return `<p class="font-mono text-xs text-brandTextSecondary">${esc(fmtDate(r.starts_at))}${r.status !== 'published' ? ` / <span class="text-google-red">${esc(r.status)}</span>` : ''}${past ? ' / past' : ''} / ${r.materials?.length || 0} materials</p>`;
+    }
+    if (table === 'people') return `<p class="font-mono text-xs text-brandTextSecondary">${esc(r.core_role || r.headline || '')}${r.is_spotlight ? ' / spotlight' : ''}</p>`;
+    if (table === 'posts' || table === 'projects') return `<p class="font-mono text-xs text-brandTextSecondary">${esc(r.status)}${r.published_at ? ` / ${esc(fmtDate(r.published_at))}` : ''}</p>`;
+    return `<p class="font-mono text-xs text-brandTextSecondary truncate">${esc(r.url || '')}</p>`;
+  };
+  $('#view').innerHTML = `
+    <div class="flex flex-wrap items-end justify-between gap-4">
+      <h1 class="font-display font-extrabold text-4xl md:text-5xl">${s.label}</h1>
+      <div class="flex gap-2 w-full sm:w-auto">
+        <input type="search" id="list-search" placeholder="Search" class="field !rounded-full flex-1 sm:w-56" aria-label="Search ${s.label}" />
+        <button type="button" id="new-btn" class="btn-press shrink-0 bg-google-blue text-white font-semibold px-5 py-3 rounded-full hover:bg-google-blue-dark">New ${s.one}</button>
+      </div>
+    </div>
+    <ul id="rows" class="mt-8 border-t border-brandBorder">
+      ${rows.map(r => `<li data-search="${esc(JSON.stringify([r.title, r.name, r.summary, r.headline]).toLowerCase())}" class="flex flex-wrap items-center gap-3 py-4 border-b border-brandBorder">
+        <button type="button" data-edit="${r.id}" class="flex-1 min-w-[220px] text-left">
+          <span class="block font-display font-bold text-lg leading-snug hover:text-google-blue">${esc(r.title || r.name)}</span>${line(r)}
+        </button>
+        <div class="flex gap-1.5">
+          ${table === 'events' && r.status !== 'draft' ? `<a href="${waLink(whatsappText([r]))}" target="_blank" rel="noopener" title="Post to WhatsApp" class="w-10 h-10 grid place-items-center rounded-full border border-brandBorder hover:border-google-green hover:text-google-green">${icon('whatsapp-logo')}</a>` : ''}
+          ${s.view ? `<a href="${s.view(r)}" target="_blank" rel="noopener" title="View on site" class="w-10 h-10 grid place-items-center rounded-full border border-brandBorder hover:border-brandTextPrimary">${icon('arrow-up-right')}</a>` : ''}
+          <button type="button" data-edit="${r.id}" title="Edit" class="w-10 h-10 grid place-items-center rounded-full border border-brandBorder hover:border-brandTextPrimary">${icon('pencil-simple')}</button>
         </div>
-    `;
-    toastContainer.appendChild(toast);
-    
-    // Animate in
-    setTimeout(() => {
-        toast.classList.remove('translate-y-full', 'opacity-0');
-    }, 10);
-
-    // Remove after 3s
-    setTimeout(() => {
-        toast.classList.add('opacity-0', 'translate-x-full');
-        setTimeout(() => toast.remove(), 300);
-    }, 3000);
+      </li>`).join('') || `<li class="py-10 text-brandTextSecondary">Nothing yet. Add the first ${s.one}.</li>`}
+    </ul>`;
+  $('#new-btn').addEventListener('click', () => openEditor(table, null));
+  $$('[data-edit]').forEach(b => b.addEventListener('click', () => openEditor(table, rows.find(r => r.id === Number(b.dataset.edit)))));
+  $('#list-search').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    $$('#rows > li[data-search]').forEach(li => { li.hidden = q && !li.dataset.search.includes(q); });
+  });
 }
 
-function customConfirm() {
-    return new Promise((resolve) => {
-        confirmModal.classList.remove('hidden');
-        setTimeout(() => {
-            confirmModal.classList.remove('opacity-0');
-            confirmModalContent.classList.remove('scale-95');
-        }, 10);
+// ── Inbox ──
+async function renderInbox() {
+  const [members, applications, subscribers] = await Promise.all([load('members', true), load('applications', true), load('subscribers', true)]);
+  const projects = await load('projects');
+  const status = (table, r) => `<select data-status="${table}:${r.id}" class="field !py-1.5 !w-auto text-sm" aria-label="Status">${['new', 'welcomed', 'contacted', 'accepted', 'archived'].map(s => `<option ${r.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select>`;
+  const del = (table, key) => `<button type="button" data-del="${table}:${esc(key)}" class="w-9 h-9 grid place-items-center rounded-full hover:bg-google-red/10 text-google-red" title="Delete">${icon('trash')}</button>`;
+  const when = (iso) => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  const section = (title, table, rows, render) => `
+    <section class="mt-10">
+      <div class="flex flex-wrap items-center justify-between gap-3"><h2 class="font-display font-bold text-2xl">${title} <span class="font-mono text-sm text-brandTextSecondary">${rows.length}</span></h2>
+      <a href="/api/admin/export?table=${table}" class="inline-flex items-center gap-2 text-sm font-semibold border border-brandBorder rounded-full px-4 py-2 hover:border-brandTextPrimary">${icon('download-simple')} CSV</a></div>
+      <ul class="mt-4 border-t border-brandBorder">${rows.map(render).join('') || '<li class="py-6 text-brandTextSecondary">Nothing yet.</li>'}</ul>
+    </section>`;
 
-        confirmResolve = resolve;
-    });
+  $('#view').innerHTML = `<h1 class="font-display font-extrabold text-4xl md:text-5xl">Inbox</h1>` +
+    section('New members', 'members', members, m => `<li class="py-4 border-b border-brandBorder grid sm:grid-cols-[1fr_auto] gap-3">
+      <div><p class="font-semibold">${esc(m.name)} <a href="mailto:${esc(m.email)}" class="font-normal text-google-blue">${esc(m.email)}</a></p>
+      <p class="text-sm text-brandTextSecondary">${esc([m.academic_year, m.department, m.interests].filter(Boolean).join(' / '))} / joined ${when(m.created_at)}</p>
+      ${m.motivation ? `<p class="text-sm mt-1">${esc(m.motivation)}</p>` : ''}</div>
+      <div class="flex items-center gap-2">${status('members', m)}${del('members', m.id)}</div></li>`) +
+    section('Applications', 'applications', applications, a => `<li class="py-4 border-b border-brandBorder grid sm:grid-cols-[1fr_auto] gap-3">
+      <div><p class="font-semibold">${esc(a.name)} <a href="mailto:${esc(a.email)}" class="font-normal text-google-blue">${esc(a.email)}</a></p>
+      <p class="text-sm text-brandTextSecondary">${a.kind === 'lead' ? `Lead role: ${esc(a.role)}` : `Wants to join ${esc(projects.find(p => p.id === a.project_id)?.title || 'a project')}${a.role ? ` as ${esc(a.role)}` : ''}`} / ${when(a.created_at)}</p>
+      ${a.details ? `<p class="text-sm mt-1 whitespace-pre-line">${esc(a.details)}</p>` : ''}</div>
+      <div class="flex items-center gap-2">${status('applications', a)}${del('applications', a.id)}</div></li>`) +
+    section('Newsletter', 'subscribers', subscribers, s => `<li class="py-3 border-b border-brandBorder flex items-center justify-between gap-3"><span>${esc(s.email)} <span class="text-sm text-brandTextSecondary">${when(s.created_at)}</span></span>${del('subscribers', s.email)}</li>`);
+
+  $$('[data-status]').forEach(sel => sel.addEventListener('change', async () => {
+    const [table, id] = sel.dataset.status.split(':');
+    try { await api(`${table}/${id}`, { method: 'PUT', body: JSON.stringify({ status: sel.value }) }); toast('Updated'); } catch (e) { toast(e.message, true); }
+  }));
+  $$('[data-del]').forEach(b => b.addEventListener('click', async () => {
+    const [table, key] = b.dataset.del.split(/:(.+)/);
+    if (!confirm('Delete this permanently?')) return;
+    try { await api(`${table}/${encodeURIComponent(key)}`, { method: 'DELETE' }); toast('Deleted'); renderInbox(); } catch (e) { toast(e.message, true); }
+  }));
 }
 
-function closeConfirmModal(result) {
-    confirmModal.classList.add('opacity-0');
-    confirmModalContent.classList.add('scale-95');
-    setTimeout(() => {
-        confirmModal.classList.add('hidden');
-        if (confirmResolve) confirmResolve(result);
-    }, 200);
+// ── Editor ──
+let editing = null;
+function fieldHtml(f, v) {
+  const id = `f-${f.k}`;
+  const label = `<label class="label" for="${id}">${f.label}${f.req ? ' <span class="text-google-red">*</span>' : ''}</label>`;
+  const help = f.help ? `<p class="text-xs text-brandTextSecondary mt-1.5">${esc(f.help)}</p>` : '';
+  const people = cache.people || [];
+  switch (f.type) {
+    case 'textarea': return `<div>${label}<textarea id="${id}" name="${f.k}" rows="${f.rows || 4}" class="field">${esc(v)}</textarea>${help}</div>`;
+    case 'select': return `<div>${label}<select id="${id}" name="${f.k}" class="field">${f.options.map(([val, l]) => `<option value="${val}" ${String(v ?? f.options[0][0]) === val ? 'selected' : ''}>${l}</option>`).join('')}</select>${help}</div>`;
+    case 'check': return `<label class="flex items-center gap-3 font-semibold"><input type="checkbox" name="${f.k}" ${v ? 'checked' : ''} class="w-5 h-5 accent-[#1A73E8]" /> ${f.label}</label>${help}`;
+    case 'number': return `<div>${label}<input id="${id}" type="number" name="${f.k}" value="${esc(v ?? 0)}" class="field !w-32" />${help}</div>`;
+    case 'url': return `<div>${label}<input id="${id}" type="url" name="${f.k}" value="${esc(v)}" placeholder="${esc(f.placeholder || 'https://')}" class="field" />${help}</div>`;
+    case 'when': {
+      const [d, t] = v ? [v.slice(0, 10), /T(\d{2}:\d{2})/.exec(v)?.[1] || ''] : ['', ''];
+      return `<div>${label}<div class="flex gap-2"><input id="${id}" type="date" name="${f.k}__date" value="${d}" class="field" /><input type="time" name="${f.k}__time" value="${t}" class="field !w-36" aria-label="${f.label} time" /></div>${help}</div>`;
+    }
+    case 'image': return `<div>${label}<div class="flex gap-2 items-start">
+        <input id="${id}" name="${f.k}" value="${esc(v)}" placeholder="https://... or upload" class="field" />
+        <label class="btn-press shrink-0 cursor-pointer border border-brandBorder rounded-full px-4 py-3 text-sm font-semibold hover:border-brandTextPrimary">Upload<input type="file" accept="image/*" data-upload="${f.k}" class="sr-only" /></label></div>
+        ${v ? `<img src="${esc(v)}" alt="" class="mt-2 h-24 rounded-xl object-cover" data-preview="${f.k}" />` : `<img alt="" class="mt-2 h-24 rounded-xl object-cover hidden" data-preview="${f.k}" />`}${help}</div>`;
+    case 'person': return `<div>${label}<select id="${id}" name="${f.k}" class="field"><option value="">None</option>${people.map(p => `<option value="${p.id}" ${Number(v) === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>${help}</div>`;
+    case 'event': return `<div>${label}<select id="${id}" name="${f.k}" class="field"><option value="">None</option>${(cache.events || []).map(e => `<option value="${e.id}" ${Number(v) === e.id ? 'selected' : ''}>${esc(e.title)}</option>`).join('')}</select>${help}</div>`;
+    case 'materials': return `<fieldset><legend class="label">${f.label}</legend><div data-list="materials" class="space-y-2">${(v || []).map(materialRow).join('')}</div>
+        <button type="button" data-add="materials" class="mt-2 text-sm font-semibold text-google-blue">+ Add material</button>${help}</fieldset>`;
+    case 'people': return `<fieldset><legend class="label">${f.label}</legend><div data-list="people" data-roles="${esc(f.roles.join('|'))}" class="space-y-2">${(v || []).map(r => personRow(r, f.roles)).join('')}</div>
+        <button type="button" data-add="people" class="mt-2 text-sm font-semibold text-google-blue">+ Add person</button>${people.length ? '' : '<p class="text-xs text-brandTextSecondary mt-1.5">Add people in the People tab first.</p>'}${help}</fieldset>`;
+    default: return `<div>${label}<input id="${id}" name="${f.k}" value="${esc(v)}" placeholder="${esc(f.placeholder || '')}" class="field" ${f.req ? 'required' : ''} />${help}</div>`;
+  }
 }
+const MAT_KINDS = [['slides', 'Slides'], ['code', 'Code'], ['recording', 'Recording'], ['doc', 'Doc'], ['link', 'Link']];
+const materialRow = (m = {}) => `<div data-row class="grid grid-cols-[1fr_auto] sm:grid-cols-[1fr_1.4fr_auto_auto] gap-2 items-center rounded-2xl bg-brandBgSecondary p-2">
+  <input data-f="label" value="${esc(m.label)}" placeholder="Label, e.g. Slides" class="field" aria-label="Material label" />
+  <input data-f="url" value="${esc(m.url)}" placeholder="https://" class="field col-span-2 sm:col-span-1 row-start-2 sm:row-start-auto" aria-label="Material link" />
+  <select data-f="kind" class="field !w-auto" aria-label="Material type">${MAT_KINDS.map(([v, l]) => `<option value="${v}" ${m.kind === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+  <button type="button" data-remove class="w-9 h-9 grid place-items-center rounded-full hover:bg-google-red/10 text-google-red" aria-label="Remove">${icon('x')}</button></div>`;
+const personRow = (r = {}, roles) => `<div data-row class="grid grid-cols-[1fr_auto_auto] gap-2 items-center rounded-2xl bg-brandBgSecondary p-2">
+  <select data-f="person_id" class="field" aria-label="Person"><option value="">Choose person</option>${(cache.people || []).map(p => `<option value="${p.id}" ${r.person_id === p.id ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select>
+  <select data-f="role" class="field !w-auto" aria-label="Role">${roles.map(x => `<option ${r.role === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
+  <button type="button" data-remove class="w-9 h-9 grid place-items-center rounded-full hover:bg-google-red/10 text-google-red" aria-label="Remove">${icon('x')}</button></div>`;
 
-if(confirmCancelBtn) confirmCancelBtn.addEventListener('click', () => closeConfirmModal(false));
-if(confirmDeleteBtn) confirmDeleteBtn.addEventListener('click', () => closeConfirmModal(true));
-
-// --- Search Filtering ---
-if (tableSearch) {
-    tableSearch.addEventListener('input', (e) => {
-        const query = e.target.value.toLowerCase();
-        if (!query) {
-            renderTable(dataList, tableConfigs[currentTab]);
-            return;
-        }
-        
-        const config = tableConfigs[currentTab];
-        const filtered = dataList.filter(item => {
-            return config.displayCols.some(col => {
-                const val = item[col];
-                return val && String(val).toLowerCase().includes(query);
-            });
-        });
-        renderTable(filtered, config);
-    });
+async function openEditor(table, row) {
+  const s = SCHEMAS[table];
+  if (s.fields.some(f => f.type === 'event')) await load('events');
+  editing = { table, row };
+  $('#drawer-title').textContent = row ? `Edit ${s.one}` : `New ${s.one}`;
+  $('#editor-fields').innerHTML = s.fields.map(f => fieldHtml(f, row?.[f.k])).join('');
+  $('#delete-btn').hidden = !row;
+  const d = $('#drawer');
+  d.hidden = false;
+  requestAnimationFrame(() => d.classList.add('active'));
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => $('#editor-fields input')?.focus(), 60);
 }
-
-// --- Data Loading & Rendering ---
-async function loadTabData(tabId) {
-    contentContainer.innerHTML = `<div class="p-8 text-center text-gray-500">Loading...</div>`;
-    
-    const config = tableConfigs[tabId];
-    const { data, error } = await supabase
-        .from(config.table)
-        .select('*')
-        .order(config.sortCol || 'id', { ascending: config.sortAsc === true });
-
-    if (error) {
-        contentContainer.innerHTML = `<div class="p-8 text-center text-red-500">Error loading data: ${error.message}. <br>Make sure the table '${config.table}' exists in Supabase.</div>`;
-        return;
-    }
-
-    dataList = data;
-    if(tableSearch) tableSearch.value = ""; // clear search on load
-    renderTable(data, config);
+function closeEditor() {
+  const d = $('#drawer');
+  d.classList.remove('active');
+  document.body.style.overflow = '';
+  setTimeout(() => { d.hidden = true; }, 300);
 }
+$$('[data-close-drawer]').forEach(b => b.addEventListener('click', closeEditor));
+$('#drawer').addEventListener('click', (e) => { if (e.target.id === 'drawer') closeEditor(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#drawer').hidden) closeEditor(); });
 
-function renderTable(data, config) {
-    if (data.length === 0) {
-        contentContainer.innerHTML = `<div class="p-8 text-center text-gray-500">No records found.</div>`;
-        return;
-    }
-
-    let thead = `<thead class="bg-gray-50 border-b border-gray-200"><tr>`;
-    config.displayCols.forEach(col => {
-        thead += `<th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">${col.replace('_', ' ')}</th>`;
-    });
-    if (!config.readonly || config.allowDelete || config.hasPreview || config.hasDetails) {
-        thead += `<th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>`;
-    }
-    thead += `</tr></thead>`;
-
-    let tbody = `<tbody class="divide-y divide-gray-200">`;
-    data.forEach(item => {
-        tbody += `<tr class="hover:bg-gray-50 transition-colors">`;
-        config.displayCols.forEach(col => {
-            let val = item[col] || '';
-            let content = '';
-
-            // Handle images nicely, or author avatars
-            if (col === 'author' && currentTab === 'blog') {
-               content = `
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-google-blue/10 flex items-center justify-center text-google-blue font-bold mr-3">
-                      ${val.charAt(0).toUpperCase()}
-                    </div>
-                    <span>${val}</span>
-                  </div>`;
-            } else if (col === 'role') {
-               content = `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">${val}</span>`;
-            } else if (col === 'is_spotlight') {
-               content = item[col]
-                 ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">★ Spotlight</span>'
-                 : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-500">—</span>';
-            } else if (col === 'is_active') {
-               content = item[col]
-                 ? '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Active</span>'
-                 : '<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-500">Inactive</span>';
-            } else if (col === 'created_at') {
-                content = new Date(val).toLocaleDateString();
-            } else if (col === 'image' || (typeof val === 'string' && val.match(/\\.(jpeg|jpg|gif|png|webp|svg)(\\?.*)?$/i))) {
-                if (val && val.trim() !== '') {
-                    content = `<div class="flex items-center"><img src="${val}" alt="Preview" class="h-10 w-10 rounded object-cover border border-gray-200 shadow-sm" loading="lazy"></div>`;
-                } else {
-                    content = `<span class="text-xs text-gray-400 italic">No image</span>`;
-                }
-            } else {
-               if (val && typeof val === 'string' && val.length > 50) val = val.substring(0, 50) + '...';
-               content = val;
-            }
-
-            tbody += `<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">${content}</td>`;
-        });
-        
-        if (!config.readonly || config.allowDelete || config.hasPreview || config.hasDetails) {
-            tbody += `<td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">`;
-            
-            if (config.hasPreview) {
-               let previewHref = 'index.html';
-               if(currentTab === 'blog') previewHref = `blog.html?v=v2&id=${item.id}`;
-               else if(currentTab === 'projects') previewHref = `project.html?v=v2&id=${item.id}`;
-               else if(currentTab === 'schedule') previewHref = 'plan.html';
-               else previewHref = `index.html#${currentTab}`;
-               
-               tbody += `<a href="${previewHref}" target="_blank" class="text-green-600 hover:text-green-900 mr-3 transition-colors hover:bg-green-50 px-2 py-1 rounded inline-block">Preview</a>`;
-            }
-            if (config.hasDetails) {
-                 tbody += `<button class="text-indigo-600 hover:text-indigo-900 mr-3 edit-item-btn transition-colors hover:bg-indigo-50 px-2 py-1 rounded" data-id="${item.id}">Details</button>`;
-            } else if (!config.readonly) {
-                 tbody += `<button class="text-indigo-600 hover:text-indigo-900 mr-3 edit-item-btn transition-colors hover:bg-indigo-50 px-2 py-1 rounded" data-id="${item.id}">Edit</button>`;
-            }
-            if (!config.readonly || config.allowDelete) {
-                 tbody += `<button class="text-red-600 hover:text-red-900 delete-item-btn transition-colors hover:bg-red-50 px-2 py-1 rounded" data-id="${item.id}">Delete</button>`;
-            }
-            tbody += `</td>`;
-        }
-        tbody += `</tr>`;
-    });
-    tbody += `</tbody>`;
-
-    contentContainer.innerHTML = `<div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200">${thead}${tbody}</table></div>`;
-
-    // Attach event listeners to buttons
-    if (!config.readonly || config.hasDetails) {
-        document.querySelectorAll('.edit-item-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => openModal(e.target.dataset.id));
-        });
-    }
-    if (!config.readonly || config.allowDelete) {
-        document.querySelectorAll('.delete-item-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => deleteItem(e.target.dataset.id));
-        });
-    }
-}
-
-// --- CRUD Operations ---
-function openModal(id = null) {
-    editingId = id;
-    const config = tableConfigs[currentTab];
-    modalTitle.textContent = id ? `Edit Item` : `Add New Item`;
-    
-    let itemData = {};
-    if (id) {
-        itemData = dataList.find(d => d.id == id) || {};
-    }
-
-    // Build form
-    let html = '';
-    
-    if (config.readonly) {
-        saveModalBtn.classList.add('hidden');
-    } else {
-        saveModalBtn.classList.remove('hidden');
-    }
-
-    config.fields.forEach(field => {
-        let val = itemData[field.name] || '';
-        if (field.name === 'created_at' && val) val = new Date(val).toLocaleString();
-        
-        html += `<div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">${field.label} ${field.required && !config.readonly ? '<span class="text-red-500">*</span>' : ''}</label>`;
-        
-        if (config.readonly) {
-            html += `<div class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-700 whitespace-pre-wrap">${val}</div>`;
-        } else if (field.type === 'textarea') {
-            if (field.isHtml) {
-                html += `<div id="quill-editor-${field.name}" class="bg-white rounded-b-lg border-x border-b border-gray-300" style="height: 250px;">${val}</div>`;
-            } else {
-                html += `<textarea name="${field.name}" ${field.required ? 'required' : ''} rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue outline-none transition-all">${val}</textarea>`;
-            }
-        } else if (field.type === 'file') {
-            html += `<input type="file" name="${field.name}" accept="image/*" class="w-full px-4 py-2 border border-gray-300 rounded-lg outline-none transition-all">`;
-            if (val) {
-                html += `<div class="text-sm text-gray-500 mt-1">Current: <a href="${val}" target="_blank" class="text-blue-500 underline">View Image</a></div>`;
-            }
-        } else if (field.type === 'select' && field.options) {
-            html += `<select name="${field.name}" ${field.required ? 'required' : ''} class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue outline-none transition-all bg-white">`;
-            html += `<option value="" disabled ${!val && val !== false && val !== true ? 'selected' : ''}>Select ${field.label}...</option>`;
-            field.options.forEach(opt => {
-                // DB stores booleans for is_startup/needs_help; options are strings
-                html += `<option value="${opt}" ${String(val) === opt ? 'selected' : ''}>${opt}</option>`;
-            });
-            html += `</select>`;
-        } else {
-            html += `<input type="${field.type}" name="${field.name}" value="${val}" ${field.required ? 'required' : ''} class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue outline-none transition-all">`;
-        }
-        html += `</div>`;
-    });
-
-    formFields.innerHTML = html;
-    
-    // Initialize Quill rich-text editors. CDN may be blocked or slow (common
-    // in some regions), so wrap in try/catch and fall back to a plain textarea
-    // so editing never silently fails.
-    quillInstances = {};
-    config.fields.forEach(field => {
-        if (field.isHtml && !config.readonly) {
-            try {
-                if (typeof Quill === 'undefined') throw new Error('Quill CDN not loaded');
-                quillInstances[field.name] = new Quill(`#quill-editor-${field.name}`, {
-                    theme: 'snow',
-                    modules: {
-                        toolbar: [
-                            [{ 'header': [1, 2, 3, false] }],
-                            ['bold', 'italic', 'underline', 'strike'],
-                            ['blockquote', 'code-block'],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            ['link', 'image'],
-                            ['clean']
-                        ]
-                    }
-                });
-            } catch (e) {
-                // Fallback: replace the Quill div with a plain textarea containing
-                // the raw HTML so the save handler can still read the content.
-                console.warn('Quill init failed, falling back to textarea:', e.message);
-                const container = document.getElementById(`quill-editor-${field.name}`);
-                if (container) {
-                    const currentHTML = container.innerHTML;
-                    const ta = document.createElement('textarea');
-                    ta.name = field.name;
-                    ta.rows = 8;
-                    ta.className = 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue outline-none transition-all';
-                    ta.value = currentHTML.replace(/<p><br><\/p>/g, '').replace(/<br>/g, '\n');
-                    container.replaceWith(ta);
-                }
-            }
-        }
-    });
-
-    // Show modal
-    editModal.classList.remove('hidden');
-    // slight delay for animation
-    setTimeout(() => {
-        editModal.classList.remove('opacity-0');
-        editModalContent.classList.remove('scale-95');
-    }, 10);
-}
-
-function closeModal() {
-    editModal.classList.add('opacity-0');
-    editModalContent.classList.add('scale-95');
-    setTimeout(() => {
-        editModal.classList.add('hidden');
-        editForm.reset();
-    }, 200);
-}
-
-closeModalBtn.addEventListener('click', closeModal);
-cancelModalBtn.addEventListener('click', closeModal);
-addNewBtnReal.addEventListener('click', () => openModal(null));
-
-// Generate a random id for new entries (or rely on Supabase UUID, but we use string/int depending on schema)
-editForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const config = tableConfigs[currentTab];
-    const formData = new FormData(editForm);
-    const saveObj = {};
-
-    saveModalBtn.textContent = "Saving...";
-    saveModalBtn.disabled = true;
-
-    // Process fields
-    for (const field of config.fields) {
-        if (field.isHtml && quillInstances[field.name]) {
-            const htmlContent = quillInstances[field.name].root.innerHTML;
-            saveObj[field.name] = htmlContent === '<p><br></p>' ? '' : htmlContent;
-        } else if (field.type === 'file') {
-            const file = formData.get(field.name);
-            if (file && file.size > 0) {
-                // Upload to Supabase Storage
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Math.random()}.${fileExt}`;
-                const filePath = `${currentTab}/${fileName}`;
-                
-                const { data, error } = await supabase.storage
-                    .from('gdg-images') // User must create this bucket!
-                    .upload(filePath, file);
-
-                if (error) {
-                    showToast('Error uploading image: ' + error.message, 'error');
-                    saveModalBtn.textContent = "Save Changes";
-                    saveModalBtn.disabled = false;
-                    return;
-                }
-                
-                // Get public URL
-                const { data: { publicUrl } } = supabase.storage
-                    .from('gdg-images')
-                    .getPublicUrl(filePath);
-                
-                saveObj.image = publicUrl;
-            }
-        } else {
-            const raw = formData.get(field.name);
-            // Boolean fields ('true'/'false' string selects) → real booleans.
-            if (field.name === 'is_startup' || field.name === 'needs_help' || field.name === 'is_spotlight' || field.name === 'is_active') {
-                saveObj[field.name] = raw === 'true';
-                continue;
-            }
-            // Numeric fields → real numbers, or omit when empty.
-            if (field.type === 'number') {
-                const trimmed = (raw || '').trim();
-                if (trimmed === '') continue; // let DB keep/use default
-                const num = Number(trimmed);
-                saveObj[field.name] = Number.isFinite(num) ? num : null;
-                continue;
-            }
-            // Trim strings; skip whitespace-only so we never send "" to a
-            // typed column (date/int) and trigger Postgres 22007 errors.
-            const trimmed = (raw === null || raw === undefined) ? '' : String(raw).trim();
-            if (trimmed === '') continue; // omit → DB default / not overwritten
-            saveObj[field.name] = trimmed;
-        }
-    }
-
-    if (!editingId) {
-        // Create
-        const { error } = await supabase.from(config.table).insert([saveObj]);
-        if (error) { showToast(error.message, 'error'); } else { showToast('Item created successfully'); }
-    } else {
-        // Update
-        const { error } = await supabase.from(config.table).update(saveObj).eq('id', editingId);
-        if (error) { showToast(error.message, 'error'); } else { showToast('Item updated successfully'); }
-    }
-
-    saveModalBtn.textContent = "Save Changes";
-    saveModalBtn.disabled = false;
-    closeModal();
-    loadTabData(currentTab);
-    loadDashboardStats();
+$('#editor-fields').addEventListener('click', (e) => {
+  const add = e.target.closest('[data-add]');
+  if (add) {
+    const list = $(`[data-list="${add.dataset.add}"]`);
+    list.insertAdjacentHTML('beforeend', add.dataset.add === 'materials' ? materialRow() : personRow({}, list.dataset.roles.split('|')));
+    $('[data-row]:last-child input, [data-row]:last-child select', list)?.focus();
+  }
+  const rm = e.target.closest('[data-remove]');
+  if (rm) rm.closest('[data-row]').remove();
 });
 
-async function deleteItem(id) {
-    const isConfirmed = await customConfirm();
-    if (isConfirmed) {
-        const config = tableConfigs[currentTab];
-        const { error } = await supabase.from(config.table).delete().eq('id', id);
-        if (error) {
-            showToast(error.message, 'error');
-        } else {
-            showToast('Item deleted successfully');
-            loadTabData(currentTab);
-            loadDashboardStats(); // update stats
-        }
-    }
-}
+// Resize to max 1400px WebP in the browser so uploads stay small on slow connections
+$('#editor-fields').addEventListener('change', async (e) => {
+  const input = e.target.closest('[data-upload]');
+  if (!input?.files[0]) return;
+  const key = input.dataset.upload;
+  try {
+    toast('Uploading...');
+    const bmp = await createImageBitmap(input.files[0]);
+    const scale = Math.min(1, 1400 / Math.max(bmp.width, bmp.height));
+    const c = Object.assign(document.createElement('canvas'), { width: Math.round(bmp.width * scale), height: Math.round(bmp.height * scale) });
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    let blob = await new Promise(r => c.toBlob(r, 'image/webp', 0.8));
+    if (blob.size > 550 * 1024) blob = await new Promise(r => c.toBlob(r, 'image/webp', 0.6));
+    const { url } = await api('upload', { method: 'POST', body: blob, headers: { 'content-type': 'image/webp' } });
+    $(`[name="${key}"]`, $('#editor')).value = url;
+    const prev = $(`[data-preview="${key}"]`);
+    prev.src = url;
+    prev.classList.remove('hidden');
+    toast('Image uploaded');
+  } catch (err) { toast(err.message, true); }
+});
 
-// --- Newsletter Compose ---
-async function composeNewsletter() {
-    // Fetch all subscribers
-    const { data: subscribers, error } = await supabase
-        .from('newsletter_subscribers')
-        .select('email');
-    
-    if (error || !subscribers || subscribers.length === 0) {
-        showToast('No subscribers found or error fetching emails.', 'error');
-        return;
-    }
+$('#editor').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const { table, row } = editing;
+  const s = SCHEMAS[table];
+  const form = $('#editor');
+  const body = {};
+  for (const f of s.fields) {
+    if (f.type === 'check') body[f.k] = $(`[name="${f.k}"]`, form).checked;
+    else if (f.type === 'when') {
+      const d = $(`[name="${f.k}__date"]`, form).value, t = $(`[name="${f.k}__time"]`, form).value;
+      body[f.k] = d ? (t ? `${d}T${t}:00+02:00` : d) : '';
+    } else if (f.type === 'materials' || f.type === 'people') {
+      body[f.k] = $$(`[data-list="${f.k}"] [data-row]`, form).map(r => Object.fromEntries($$('[data-f]', r).map(i => [i.dataset.f, i.value.trim()])))
+        .filter(x => (f.type === 'materials' ? x.url : x.person_id));
+      if (f.type === 'people') body[f.k] = body[f.k].map(x => ({ ...x, person_id: Number(x.person_id) }));
+    } else body[f.k] = $(`[name="${f.k}"]`, form).value.trim();
+  }
+  if (table === 'posts' && body.status === 'published' && !body.published_at) body.published_at = new Date().toISOString();
+  const missing = s.fields.find(f => f.req && !body[f.k]);
+  if (missing) { toast(`${missing.label} is required`, true); return; }
+  const bad = s.fields.filter(f => f.type === 'url' && body[f.k] && !/^https?:\/\//.test(body[f.k]));
+  if (bad.length) { toast(`${bad[0].label} must start with https://`, true); return; }
+  if (body.materials?.some(m => !/^https?:\/\//.test(m.url))) { toast('Material links must start with https://', true); return; }
 
-    const emails = subscribers.map(s => s.email);
-    
-    // Show compose modal
-    modalTitle.textContent = 'Compose Newsletter';
-    saveModalBtn.classList.remove('hidden');
-    saveModalBtn.textContent = 'Open in Email Client';
-    editingId = '__newsletter__';
+  const btn = $('button[type=submit]', form);
+  btn.disabled = true; btn.textContent = 'Saving...';
+  try {
+    if (row) await api(`${table}/${row.id}`, { method: 'PUT', body: JSON.stringify(body) });
+    else await api(table, { method: 'POST', body: JSON.stringify(body) });
+    btn.textContent = 'Saved';
+    toast('Saved. It is live on the site.');
+    delete cache[table];
+    closeEditor();
+    renderList(table);
+  } catch (err) { toast(err.message, true); }
+  finally { setTimeout(() => { btn.disabled = false; btn.textContent = 'Save'; }, 800); }
+});
 
-    formFields.innerHTML = `
-        <div class="mb-2 text-sm text-gray-500">Sending to <strong class="text-google-blue">${emails.length}</strong> subscriber(s)</div>
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Subject <span class="text-red-500">*</span></label>
-            <input type="text" name="newsletter-subject" required placeholder="e.g. GDG Monthly Update — March 2026" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue outline-none transition-all">
-        </div>
-        <div class="mb-4">
-            <label class="block text-sm font-semibold text-gray-700 mb-1">Message Body <span class="text-red-500">*</span></label>
-            <textarea name="newsletter-body" required rows="8" placeholder="Write your newsletter content here..." class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-google-blue outline-none transition-all"></textarea>
-        </div>
-        <input type="hidden" name="newsletter-emails" value="${emails.join(',')}">
-    `;
+$('#delete-btn').addEventListener('click', async () => {
+  const { table, row } = editing;
+  if (!row || !confirm(`Delete "${row.title || row.name}"? This can't be undone.`)) return;
+  try { await api(`${table}/${row.id}`, { method: 'DELETE' }); toast('Deleted'); delete cache[table]; closeEditor(); renderList(table); }
+  catch (err) { toast(err.message, true); }
+});
 
-    editModal.classList.remove('hidden');
-    setTimeout(() => {
-        editModal.classList.remove('opacity-0');
-        editModalContent.classList.remove('scale-95');
-    }, 10);
-}
+// Theme toggle (same behaviour as the public site)
+$$('[data-theme-toggle]').forEach(btn => btn.addEventListener('click', () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  root.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('theme', root.dataset.theme); } catch { /* ignore */ }
+}));
 
-// Override form submit for newsletter compose
-const originalFormSubmit = editForm.onsubmit;
-editForm.addEventListener('submit', async (e) => {
-    if (editingId === '__newsletter__') {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        const formData = new FormData(editForm);
-        const subject = formData.get('newsletter-subject');
-        const body = formData.get('newsletter-body');
-        const emailsStr = formData.get('newsletter-emails');
-        
-        if (!subject || !body) {
-            showToast('Please fill in subject and body.', 'error');
-            return;
-        }
-
-        const mailtoLink = `mailto:gdscau2023@gmail.com?bcc=${encodeURIComponent(emailsStr)}&subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        window.location.href = mailtoLink;
-        showToast(`Email client opened with ${emailsStr.split(',').length} recipient(s) in BCC.`);
-        closeModal();
-        editingId = null;
-        saveModalBtn.textContent = 'Save Changes';
-    }
-}, true); // Use capture to run before the other submit handler
-
-// --- Initialization ---
-checkAuth();
-switchTab('blog'); // Default tab
+boot();

@@ -1,0 +1,47 @@
+    <div id="join-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="join-title" hidden>
+      <div class="modal-content p-6 md:p-8">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="join-title" class="font-display font-extrabold text-3xl">Join GDG Africa University</h2>
+            <p class="mt-2 text-brandTextSecondary text-sm">Free, for every faculty and every level. You'll get a welcome email with next steps.</p>
+          </div>
+          <button type="button" data-close-modal class="w-10 h-10 shrink-0 grid place-items-center rounded-full hover:bg-brandBgSecondary" aria-label="Close"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+        </div>
+        <form data-form="join" class="mt-6 space-y-4" novalidate>
+          <div><label class="label" for="j-name">Full name</label><input id="j-name" name="name" required autocomplete="name" placeholder="e.g. Tendai Moyo" class="field" /></div>
+          <div><label class="label" for="j-email">Email</label><input id="j-email" type="email" name="email" required autocomplete="email" placeholder="you@africau.edu" class="field" /></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><label class="label" for="j-year">Year</label>
+              <select id="j-year" name="academic_year" class="field"><option value="">Select</option><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option><option>Postgraduate</option><option>Alumni</option></select></div>
+            <div><label class="label" for="j-dept">Department</label><input id="j-dept" name="department" placeholder="e.g. Computer Science" class="field" /></div>
+          </div>
+          <div><label class="label" for="j-int">Paths you're curious about</label><input id="j-int" name="interests" placeholder="e.g. Game dev, UI/UX, AI" class="field" /></div>
+          <div><label class="label" for="j-mot">What do you want to build? <span class="font-normal text-brandTextSecondary">(optional)</span></label><textarea id="j-mot" name="motivation" rows="3" placeholder="Anything goes, even 'no idea yet'" class="field"></textarea></div>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <button type="submit" class="btn-press w-full py-3.5 bg-google-blue text-white rounded-full font-semibold hover:bg-google-blue-dark">Join the club</button>
+          <p data-form-status class="text-center text-sm font-semibold min-h-5" role="status"></p>
+        </form>
+      </div>
+    </div>
+    <div id="collab-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="collab-title" hidden>
+      <div class="modal-content p-6 md:p-8">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h2 id="collab-title" class="font-display font-extrabold text-3xl">Join this build</h2>
+            <p class="mt-2 text-brandTextSecondary text-sm" data-collab-desc>Lend your skills to a team and help build something real.</p>
+          </div>
+          <button type="button" data-close-modal class="w-10 h-10 shrink-0 grid place-items-center rounded-full hover:bg-brandBgSecondary" aria-label="Close"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#x"></use></svg></button>
+        </div>
+        <form data-form="collab" class="mt-6 space-y-4" novalidate>
+          <input type="hidden" name="kind" value="collab" /><input type="hidden" name="project_id" />
+          <div><label class="label" for="c-name">Your name</label><input id="c-name" name="name" required autocomplete="name" class="field" /></div>
+          <div><label class="label" for="c-email">Email</label><input id="c-email" type="email" name="email" required autocomplete="email" class="field" /></div>
+          <div><label class="label" for="c-role">What can you help with?</label><input id="c-role" name="role" placeholder="e.g. Flutter, UI design, pixel art, data" class="field" /></div>
+          <div><label class="label" for="c-details">Why this project?</label><textarea id="c-details" name="details" rows="3" class="field"></textarea></div>
+          <input type="text" name="website" tabindex="-1" autocomplete="off" class="hidden" aria-hidden="true" />
+          <button type="submit" class="btn-press w-full py-3.5 bg-google-blue text-white rounded-full font-semibold hover:bg-google-blue-dark">Send to the team</button>
+          <p data-form-status class="text-center text-sm font-semibold min-h-5" role="status"></p>
+        </form>
+      </div>
+    </div>
+    <button type="button" id="back-to-top" class="fixed bottom-5 right-5 z-30 w-12 h-12 grid place-items-center rounded-full bg-brandTextPrimary text-brandBgPrimary opacity-0 invisible transition-opacity" aria-label="Back to top"><svg class="w-5 h-5" aria-hidden="true"><use href="/img/icons.svg#arrow-up"></use></svg></button>
