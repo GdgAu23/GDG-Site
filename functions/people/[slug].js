@@ -16,6 +16,7 @@ export async function onRequestGet(ctx) {
   // Timeline: everything they took part in, newest first
   const timeline = [
     ...p.events.map(e => ({ date: e.starts_at, html: `<span class="font-mono text-xs text-brandTextSecondary">${esc(e.role)}</span><a href="/events/${esc(e.slug)}" class="block font-display font-bold text-xl hover:text-google-blue">${esc(e.title)}</a>` })),
+    ...p.spotlights.map(sp => ({ date: sp.featured_on, html: `<span class="font-mono text-xs text-google-blue inline-flex items-center gap-1">${icon('star', 'w-3.5 h-3.5 text-google-yellow')}Spotlight</span><p class="font-display font-bold text-xl">${esc(sp.title)}${sp.event_title ? ` / <a href="/events/${esc(sp.event_slug)}" class="hover:text-google-blue underline underline-offset-4">${esc(sp.event_title)}</a>` : ''}</p>${sp.quote ? `<p class="mt-1 text-brandTextSecondary max-w-[60ch]">“${esc(sp.quote)}”</p>` : ''}` })),
     ...p.posts.map(po => ({ date: po.published_at, html: `<span class="font-mono text-xs text-brandTextSecondary">Wrote</span><a href="/blog/${esc(po.slug)}" class="block font-display font-bold text-xl hover:text-google-blue">${esc(po.title)}</a>` })),
   ].sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
@@ -30,6 +31,7 @@ export async function onRequestGet(ctx) {
         <h1 class="font-display font-extrabold text-[clamp(2.6rem,8vw,6rem)] leading-[0.9] mt-2">${esc(p.name)}</h1>
         ${p.headline ? `<p class="mt-3 text-lg text-brandTextSecondary">${esc(p.headline)}</p>` : ''}
         ${path ? `<p class="mt-4"><span class="inline-flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-full ${path.tone}">${icon(path.icon, 'w-4 h-4')} ${path.label}</span></p>` : ''}
+        ${p.spotlights.length ? `<p class="mt-4 inline-flex items-center gap-1.5 font-semibold">${icon('star', 'w-5 h-5 text-google-yellow')}${esc(p.spotlights[0].title)}</p>` : ''}
         ${links ? `<div class="mt-6 flex flex-wrap gap-2">${links}</div>` : ''}
       </div>
     </div>
@@ -45,12 +47,13 @@ export async function onRequestGet(ctx) {
     slots: { main },
     meta: {
       title: p.name,
-      description: metaText(p.bio || `${p.name}${p.core_role ? `, ${p.core_role}` : ''} at GDG Africa University.`),
+      description: metaText([p.bio || `${p.name}${p.core_role ? `, ${p.core_role}` : ''} at GDG Africa University.`, ...p.spotlights.map(sp => `${sp.title}.`)].join(' ')),
       image: img || undefined,
       type: 'profile',
       jsonld: {
         '@context': 'https://schema.org', '@type': 'ProfilePage',
         mainEntity: { '@type': 'Person', name: p.name, description: p.bio || undefined, image: img || undefined,
+          award: p.spotlights.length ? p.spotlights.map(sp => sp.title) : undefined,
           sameAs: ['github', 'linkedin', 'website'].map(k => safeUrl(p[k])).filter(Boolean),
           memberOf: { '@type': 'Organization', name: 'GDG on Campus Africa University', url: SITE } },
       },

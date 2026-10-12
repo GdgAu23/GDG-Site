@@ -167,6 +167,34 @@ function initFilters() {
   });
 }
 
+// ── Search (/people): matches name, roles, events, wins. ?q= links straight to results ──
+function initSearch() {
+  const input = $('[data-search-input]');
+  if (!input) return;
+  const items = $$('[data-search]');
+  const run = () => {
+    const words = input.value.toLowerCase().split(/\s+/).filter(Boolean);
+    let shown = 0;
+    items.forEach(el => {
+      const hit = words.every(w => el.dataset.search.includes(w));
+      el.toggleAttribute('data-filter-hidden', !hit);
+      shown += hit;
+    });
+    // Hide a section whose list has no matches left
+    $$('section').forEach(sec => {
+      const list = $$('[data-search]', sec);
+      if (list.length) sec.toggleAttribute('data-filter-hidden', !list.some(el => !el.hasAttribute('data-filter-hidden')));
+    });
+    $('[data-search-empty]').hidden = shown > 0 || !items.length;
+    const url = new URL(location.href);
+    input.value.trim() ? url.searchParams.set('q', input.value.trim()) : url.searchParams.delete('q');
+    history.replaceState(null, '', url);
+  };
+  input.value = new URLSearchParams(location.search).get('q') || '';
+  input.addEventListener('input', run);
+  if (input.value) run();
+}
+
 // ── Small things: copy link, slides viewer, year ──
 function initExtras() {
   document.addEventListener('click', async (e) => {
@@ -223,6 +251,7 @@ initNav();
 initModals();
 initForms();
 initFilters();
+initSearch();
 initExtras();
 initReveal();
 initCounters();

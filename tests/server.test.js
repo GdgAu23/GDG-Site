@@ -130,3 +130,14 @@ describe('email', () => {
     expect(t).toContain('https://x/events/jam');
   });
 });
+
+describe('spotlights', async () => {
+  const { spotlightRow } = await import('../functions/_lib/views.js');
+  it('escapes content and indexes it for /people search', () => {
+    const html = spotlightRow({ name: 'Ana <b>', slug: 'ana', title: 'Won the Hackathon', featured_on: '2026-10-30', event_title: 'AU Hack', event_slug: 'au-hack' });
+    expect(html).not.toContain('<b>');
+    expect(html).toContain('data-search="ana &lt;b&gt; won the hackathon au hack"');
+    expect(html).toContain('href="/events/au-hack"');
+  });
+  it('is an editable child of people', () => expect(TABLES.people.children.spotlights.cols).toContain('featured_on'));
+});

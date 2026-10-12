@@ -36,19 +36,24 @@ const buildCard = () => `
     </div>
   </div>`;
 
+// p is a spotlights row joined with the person (see db.spotlights)
 function spotlightHtml(p) {
-  const img = safeUrl(p.image) || '/images/club/club-09.webp';
+  const img = safeUrl(p.image);
   return `
   <div class="max-w-[1200px] mx-auto px-4 md:px-8 grid md:grid-cols-[0.9fr_1.1fr] gap-10 md:gap-16 items-center">
     <div class="relative">
-      <div class="aspect-[4/5] rounded-3xl overflow-hidden bg-google-yellow"><img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy" class="w-full h-full object-cover"></div>
-      <span class="absolute -top-4 right-2 md:-right-6 rotate-6 bg-google-yellow text-[#202124] font-display font-extrabold text-lg px-5 py-2.5 rounded-full">Member of the week</span>
+      <div class="aspect-[4/5] rounded-3xl overflow-hidden bg-google-yellow text-[#202124] grid place-items-center">${img ? `<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy" class="w-full h-full object-cover">` : `<span class="font-display font-extrabold text-8xl" aria-hidden="true">${esc(p.name.split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase())}</span>`}</div>
+      <span class="absolute -top-4 right-2 md:-right-6 rotate-6 bg-google-yellow text-[#202124] font-display font-extrabold text-lg px-5 py-2.5 rounded-full">Spotlight</span>
     </div>
     <div>
-      <h2 class="font-display font-extrabold text-5xl md:text-7xl leading-[0.92]">${esc(p.name)}</h2>
+      <p class="font-mono text-sm text-google-blue">${esc(p.title)}${p.event_title ? ` / <a href="/events/${esc(p.event_slug)}" class="underline underline-offset-4">${esc(p.event_title)}</a>` : ''}</p>
+      <h2 class="mt-3 font-display font-extrabold text-5xl md:text-7xl leading-[0.92]">${esc(p.name)}</h2>
       <p class="mt-3 font-mono text-sm text-brandTextSecondary">${esc(p.headline || p.core_role || '')}</p>
-      ${p.spotlight_quote ? `<blockquote class="mt-8 font-display text-2xl md:text-3xl leading-snug font-medium max-w-[26ch]">“${esc(p.spotlight_quote)}”</blockquote>` : ''}
-      <a href="/people/${esc(p.slug)}" class="btn-press mt-8 inline-flex items-center gap-2 border border-brandTextPrimary rounded-full px-6 py-3 font-semibold hover:bg-brandTextPrimary hover:text-brandBgPrimary">See their work ${icon('arrow-right', 'w-4 h-4')}</a>
+      ${p.quote ? `<blockquote class="mt-8 font-display text-2xl md:text-3xl leading-snug font-medium max-w-[26ch]">“${esc(p.quote)}”</blockquote>` : ''}
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a href="/people/${esc(p.slug)}" class="btn-press inline-flex items-center gap-2 border border-brandTextPrimary rounded-full px-6 py-3 font-semibold hover:bg-brandTextPrimary hover:text-brandBgPrimary">See their work ${icon('arrow-right', 'w-4 h-4')}</a>
+        <a href="/people#spotlights" class="btn-press inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold text-brandTextSecondary hover:text-brandTextPrimary">Past spotlights</a>
+      </div>
     </div>
   </div>`;
 }

@@ -14,8 +14,9 @@ export const TABLES = {
     children: { people: { table: 'project_people', fk: 'project_id', cols: ['person_id', 'role'] } },
   },
   people: {
-    cols: ['slug', 'name', 'headline', 'bio', 'path', 'image', 'github', 'linkedin', 'website', 'core_role', 'sort', 'spotlight_quote', 'is_spotlight'],
+    cols: ['slug', 'name', 'headline', 'bio', 'path', 'image', 'github', 'linkedin', 'website', 'core_role', 'sort'],
     required: ['name'], slugFrom: 'name', order: '(core_role IS NULL), sort, name',
+    children: { spotlights: { table: 'spotlights', fk: 'person_id', cols: ['title', 'quote', 'event_id', 'featured_on'] } },
   },
   posts: {
     cols: ['slug', 'title', 'excerpt', 'body', 'cover', 'tags', 'author_id', 'status', 'published_at'],

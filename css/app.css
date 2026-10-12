@@ -94,6 +94,8 @@ a:hover > .btn-arrow, button:hover > .btn-arrow { transform: translateX(3px); }
 #hero-canvas.grabbable { cursor: grab; }
 #hero-canvas.grabbing { cursor: grabbing; }
 
+/* Tiles fall behind the hero text: a page-coloured halo keeps letters readable over them */
+.hero-legible { text-shadow: 0 0 2px hsl(var(--bg-primary)), 0 0 10px hsl(var(--bg-primary)), 0 0 24px hsl(var(--bg-primary)); }
 .hero-line { display: block; overflow: hidden; padding-bottom: .06em; }
 .hero-line > span { display: inline-block; }
 @media (prefers-reduced-motion: no-preference) {

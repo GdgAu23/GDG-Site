@@ -97,13 +97,29 @@ export function projectCard(p, i = 0) {
 export function personCard(p, i = 0) {
   const img = safeUrl(p.image);
   return `
-  <a href="/people/${esc(p.slug)}" class="group block">
+  <a href="/people/${esc(p.slug)}" class="group block"${p.search ? ` data-search="${esc(p.search.toLowerCase())}"` : ''}>
     <div class="img-zoom aspect-[4/5] rounded-3xl overflow-hidden ${img ? 'bg-brandBgSecondary' : FILLS[i % 4]}">
       ${img ? `<img src="${esc(img)}" alt="" loading="lazy" decoding="async" class="w-full h-full object-cover">` : `<div class="w-full h-full grid place-items-center font-display font-extrabold text-6xl">${initials(p.name)}</div>`}
     </div>
     <h3 class="font-display font-bold text-xl mt-4 leading-tight group-hover:text-google-blue">${esc(p.name)}</h3>
     <p class="text-sm text-brandTextSecondary mt-1">${esc(p.core_role || p.headline || '')}</p>
+    ${p.spotlight_title ? `<p class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold">${icon('star', 'w-4 h-4 text-google-yellow')}${esc(p.spotlight_title)}</p>` : ''}
   </a>`;
+}
+
+// One row of the spotlight history on /people and on a profile.
+export function spotlightRow(s, i = 0, { withPerson = true } = {}) {
+  const search = [s.name, s.title, s.quote, s.event_title].filter(Boolean).join(' ').toLowerCase();
+  return `
+  <li class="relative grid grid-cols-[auto_1fr] gap-4 items-start py-5 border-b border-brandBorder" data-search="${esc(search)}">
+    ${withPerson ? avatar(s, 'w-14 h-14 text-lg', i) : `<span class="w-10 h-10 rounded-full grid place-items-center bg-google-yellow text-[#202124]">${icon('star', 'w-5 h-5')}</span>`}
+    <div class="min-w-0">
+      <p class="font-mono text-xs text-brandTextSecondary">${esc(formatDate(s.featured_on))}</p>
+      ${withPerson ? `<a href="/people/${esc(s.slug)}" class="block font-display font-bold text-xl hover:text-google-blue after:absolute after:inset-0">${esc(s.name)}</a>` : ''}
+      <p class="${withPerson ? 'text-brandTextSecondary' : 'font-display font-bold text-xl'}">${esc(s.title)}${s.event_title ? ` / <a href="/events/${esc(s.event_slug)}" class="relative z-10 underline underline-offset-4 hover:text-google-blue">${esc(s.event_title)}</a>` : ''}</p>
+      ${s.quote ? `<p class="mt-2 max-w-[60ch] leading-relaxed">“${esc(s.quote)}”</p>` : ''}
+    </div>
+  </li>`;
 }
 
 export function postCard(post, i = 0) {

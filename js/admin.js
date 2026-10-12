@@ -83,8 +83,7 @@ const SCHEMAS = {
       { k: 'github', type: 'url', label: 'GitHub' },
       { k: 'linkedin', type: 'url', label: 'LinkedIn' },
       { k: 'website', type: 'url', label: 'Website' },
-      { k: 'is_spotlight', type: 'check', label: 'Member of the week', help: 'The most recently saved spotlight person is featured on the homepage.' },
-      { k: 'spotlight_quote', type: 'textarea', rows: 2, label: 'Spotlight quote' },
+      { k: 'spotlights', type: 'spotlights', label: 'Spotlights', help: 'Won a hackathon, gave a talk, shipped something. Every entry stays on their profile and on /people. The newest one dated today or earlier is featured on the homepage.' },
     ],
   },
   posts: {
@@ -256,7 +255,7 @@ async function renderList(table) {
       const past = r.starts_at.slice(0, 10) < t;
       return `<p class="font-mono text-xs text-brandTextSecondary">${esc(fmtDate(r.starts_at))}${r.status !== 'published' ? ` / <span class="text-google-red">${esc(r.status)}</span>` : ''}${past ? ' / past' : ''} / ${r.materials?.length || 0} materials</p>`;
     }
-    if (table === 'people') return `<p class="font-mono text-xs text-brandTextSecondary">${esc(r.core_role || r.headline || '')}${r.is_spotlight ? ' / spotlight' : ''}</p>`;
+    if (table === 'people') return `<p class="font-mono text-xs text-brandTextSecondary">${esc(r.core_role || r.headline || '')}${r.spotlights?.length ? ` / ${r.spotlights.length} spotlight${r.spotlights.length > 1 ? 's' : ''}` : ''}</p>`;
     if (table === 'posts' || table === 'projects') return `<p class="font-mono text-xs text-brandTextSecondary">${esc(r.status)}${r.published_at ? ` / ${esc(fmtDate(r.published_at))}` : ''}</p>`;
     return `<p class="font-mono text-xs text-brandTextSecondary truncate">${esc(r.url || '')}</p>`;
   };
@@ -353,6 +352,8 @@ function fieldHtml(f, v) {
         <button type="button" data-add="materials" class="mt-2 text-sm font-semibold text-google-blue">+ Add material</button>${help}</fieldset>`;
     case 'people': return `<fieldset><legend class="label">${f.label}</legend><div data-list="people" data-roles="${esc(f.roles.join('|'))}" class="space-y-2">${(v || []).map(r => personRow(r, f.roles)).join('')}</div>
         <button type="button" data-add="people" class="mt-2 text-sm font-semibold text-google-blue">+ Add person</button>${people.length ? '' : '<p class="text-xs text-brandTextSecondary mt-1.5">Add people in the People tab first.</p>'}${help}</fieldset>`;
+    case 'spotlights': return `<fieldset><legend class="label">${f.label}</legend><div data-list="spotlights" class="space-y-2">${[...(v || [])].sort((a, b) => b.featured_on.localeCompare(a.featured_on)).map(spotlightRow).join('')}</div>
+        <button type="button" data-add="spotlights" class="mt-2 text-sm font-semibold text-google-blue">+ Add spotlight</button>${help}</fieldset>`;
     default: return `<div>${label}<input id="${id}" name="${f.k}" value="${esc(v)}" placeholder="${esc(f.placeholder || '')}" class="field" ${f.req ? 'required' : ''} />${help}</div>`;
   }
 }
@@ -367,9 +368,18 @@ const personRow = (r = {}, roles) => `<div data-row class="grid grid-cols-[1fr_a
   <select data-f="role" class="field !w-auto" aria-label="Role">${roles.map(x => `<option ${r.role === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
   <button type="button" data-remove class="w-9 h-9 grid place-items-center rounded-full hover:bg-google-red/10 text-google-red" aria-label="Remove">${icon('x')}</button></div>`;
 
+const spotlightRow = (r = {}) => `<div data-row class="grid grid-cols-[1fr_auto] gap-2 rounded-2xl bg-brandBgSecondary p-2">
+  <input data-f="title" value="${esc(r.title)}" placeholder="What for, e.g. Won the GDG AU Hackathon" class="field" aria-label="Spotlight title" />
+  <button type="button" data-remove class="w-9 h-9 self-center grid place-items-center rounded-full hover:bg-google-red/10 text-google-red" aria-label="Remove">${icon('x')}</button>
+  <div class="col-span-2 grid gap-2 sm:grid-cols-[auto_1fr]">
+    <input data-f="featured_on" type="date" value="${esc(r.featured_on || today())}" class="field" aria-label="Featured on" />
+    <select data-f="event_id" class="field" aria-label="Event (optional)"><option value="">No event</option>${(cache.events || []).map(e => `<option value="${e.id}" ${r.event_id === e.id ? 'selected' : ''}>${esc(e.title)}</option>`).join('')}</select>
+  </div>
+  <textarea data-f="quote" rows="2" placeholder="Quote (optional)" class="field col-span-2" aria-label="Spotlight quote">${esc(r.quote)}</textarea></div>`;
+
 async function openEditor(table, row) {
   const s = SCHEMAS[table];
-  if (s.fields.some(f => f.type === 'event')) await load('events');
+  if (s.fields.some(f => f.type === 'event' || f.type === 'spotlights')) await load('events');
   editing = { table, row };
   $('#drawer-title').textContent = row ? `Edit ${s.one}` : `New ${s.one}`;
   $('#editor-fields').innerHTML = s.fields.map(f => fieldHtml(f, row?.[f.k])).join('');
@@ -394,8 +404,9 @@ $('#editor-fields').addEventListener('click', (e) => {
   const add = e.target.closest('[data-add]');
   if (add) {
     const list = $(`[data-list="${add.dataset.add}"]`);
-    list.insertAdjacentHTML('beforeend', add.dataset.add === 'materials' ? materialRow() : personRow({}, list.dataset.roles.split('|')));
-    $('[data-row]:last-child input, [data-row]:last-child select', list)?.focus();
+    const kind = add.dataset.add;
+    list.insertAdjacentHTML(kind === 'spotlights' ? 'afterbegin' : 'beforeend', kind === 'materials' ? materialRow() : kind === 'spotlights' ? spotlightRow() : personRow({}, list.dataset.roles.split('|')));
+    $(`[data-row]:${kind === 'spotlights' ? 'first' : 'last'}-child input, [data-row]:last-child select`, list)?.focus();
   }
   const rm = e.target.closest('[data-remove]');
   if (rm) rm.closest('[data-row]').remove();
@@ -434,9 +445,10 @@ $('#editor').addEventListener('submit', async (e) => {
     else if (f.type === 'when') {
       const d = $(`[name="${f.k}__date"]`, form).value, t = $(`[name="${f.k}__time"]`, form).value;
       body[f.k] = d ? (t ? `${d}T${t}:00+02:00` : d) : '';
-    } else if (f.type === 'materials' || f.type === 'people') {
+    } else if (f.type === 'materials' || f.type === 'people' || f.type === 'spotlights') {
       body[f.k] = $$(`[data-list="${f.k}"] [data-row]`, form).map(r => Object.fromEntries($$('[data-f]', r).map(i => [i.dataset.f, i.value.trim()])))
-        .filter(x => (f.type === 'materials' ? x.url : x.person_id));
+        .filter(x => ({ materials: x.url, people: x.person_id, spotlights: x.title })[f.type]);
+      if (f.type === 'spotlights') body[f.k] = body[f.k].map(x => ({ ...x, featured_on: x.featured_on || today() }));
       if (f.type === 'people') body[f.k] = body[f.k].map(x => ({ ...x, person_id: Number(x.person_id) }));
     } else body[f.k] = $(`[name="${f.k}"]`, form).value.trim();
   }
