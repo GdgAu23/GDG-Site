@@ -22,8 +22,9 @@ export default {
       },
       fontFamily: {
         sans: ['Geist', 'system-ui', 'sans-serif'],
-        display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
-        mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+        // One family site-wide; font-display/font-mono stay as hooks for weight and spacing
+        display: ['Geist', 'system-ui', 'sans-serif'],
+        mono: ['Geist', 'system-ui', 'sans-serif'],
       },
     },
   },

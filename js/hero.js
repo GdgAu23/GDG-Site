@@ -44,7 +44,7 @@ function start() {
   engine.gravity.y = 1;
 
   let W = 0, H = 0, dpr = 1, unit = 56, walls = [], tiles = [];
-  let running = false, visible = true, last = 0, calm = 0;
+  let running = false, visible = true, last = 0, calm = 0, scrollKick = 0;
   let theme = readTheme();
 
   function readTheme() {
@@ -158,6 +158,19 @@ function start() {
     if (!running) return;
     const dt = Math.min(now - last || 16.67, 33);
     last = now;
+    if (scrollKick) {
+      // Scrolling shakes the pile: tiles hop and tumble in proportion to scroll speed
+      const k = Math.min(1, Math.abs(scrollKick) / 80);
+      const spin = Math.sign(scrollKick);
+      scrollKick = 0;
+      for (const b of tiles) {
+        Sleeping.set(b, false);
+        // Cap upward speed so a fast flick shakes the pile without launching it out of the hero
+        const vy = Math.max(-9, b.velocity.y - (1.5 + Math.random() * 2.5) * k);
+        Body.setVelocity(b, { x: b.velocity.x + (Math.random() - 0.5) * 3 * k, y: vy });
+        Body.setAngularVelocity(b, b.angularVelocity + (Math.random() - 0.5) * 0.08 * k * spin);
+      }
+    }
     Engine.update(engine, dt);
     draw();
     // Matter rarely puts stacked bodies to sleep, so also stop after ~1s of near-stillness
@@ -234,6 +247,15 @@ function start() {
     el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
     el.animate([{ outline: '3px solid #1A73E8', outlineOffset: '6px' }, { outline: '3px solid transparent', outlineOffset: '12px' }], { duration: 1400, delay: 500, easing: 'ease-out' });
   }
+
+  // ── Scroll ────────────────────────────────────
+  let lastY = scrollY;
+  addEventListener('scroll', () => {
+    const y = scrollY;
+    if (visible) scrollKick += y - lastY; // offscreen scrolling doesn't bank a kick for later
+    lastY = y;
+    wake();
+  }, { passive: true });
 
   // ── Lifecycle ─────────────────────────────────
   new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) wake(); }).observe(canvas);
