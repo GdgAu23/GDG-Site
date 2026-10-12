@@ -211,8 +211,10 @@ async function renderOverview() {
   const stat = (n, label, href) => `<a href="${href}" class="rounded-3xl border border-brandBorder bg-brandBgTertiary p-5 hover:border-brandTextPrimary"><p class="font-display font-extrabold text-4xl">${n}</p><p class="text-sm text-brandTextSecondary mt-1">${label}</p></a>`;
   const digest = thisWeek.length ? whatsappText(thisWeek) : '';
   const setup = [
-    [!!me.clientId, 'Google sign-in configured (GOOGLE_CLIENT_ID)'],
-    [!!me.mail, 'Welcome emails connected (Apps Script)'],
+    [!!me.clientId, 'Google sign-in (GOOGLE_CLIENT_ID)'],
+    [!!me.mail, 'Admin email alerts (RESEND_API_KEY)'],
+    [!!me.cron, 'Monday WhatsApp post and newsletter (cron Worker)'],
+    [!!me.mailPublic, 'Emails to students: welcome and newsletter (needs a domain verified in Resend, then MAIL_FROM)'],
   ];
 
   $('#view').innerHTML = `

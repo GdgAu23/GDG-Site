@@ -97,7 +97,7 @@ function initModals() {
 // ── Forms: every [data-form] posts JSON to /api/<name>. Send -> Sending -> Sent ──
 const ENDPOINT = { join: '/api/join', apply: '/api/apply', collab: '/api/apply', subscribe: '/api/subscribe' };
 const SUCCESS = {
-  join: 'Welcome in. Check your inbox for next steps.',
+  join: "Welcome in. Join the WhatsApp group for session updates.",
   apply: "Application received. We'll reply by email.",
   collab: 'Sent. The team lead will be in touch.',
   subscribe: "You're subscribed. See you on Monday.",

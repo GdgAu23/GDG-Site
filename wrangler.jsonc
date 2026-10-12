@@ -11,10 +11,15 @@
     // Comma-separated Google accounts allowed into /admin
     "ADMIN_EMAILS": "gdscau2023@gmail.com",
     // OAuth client ID from Google Cloud Console (public value, safe to commit). Empty until created.
-    "GOOGLE_CLIENT_ID": ""
+    "GOOGLE_CLIENT_ID": "717675065584-013v96a227rcu97fe12kclv20or6ka1p.apps.googleusercontent.com",
+    // Who gets new-member/application alerts and the Monday WhatsApp post
+    "ADMIN_NOTIFY": "gdscau2023@gmail.com",
+    // Sender. Must be on a domain verified in Resend before students can receive mail.
+    // The resend.dev sandbox address only reaches the Resend account owner (the club inbox).
+    "MAIL_FROM": "GDG Africa University <onboarding@resend.dev>"
   }
   // Secrets (set with `npx wrangler pages secret put NAME`):
   //   SESSION_SECRET      random 32+ chars, signs admin sessions
-  //   APPS_SCRIPT_URL     the deployed Gmail Apps Script web app URL
-  //   APPS_SCRIPT_SECRET  shared secret, must match the script's SHARED_SECRET property
+  //   RESEND_API_KEY      Resend API key (send-only is enough)
+  //   CRON_SECRET         shared with workers/weekly-cron, protects /api/mail/weekly
 }

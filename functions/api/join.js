@@ -1,7 +1,9 @@
-// POST /api/join: membership sign-up. Sends the welcome email via Apps Script.
+// POST /api/join: membership sign-up. Welcome email to the member (needs a verified domain)
+// and an alert to the club inbox.
 import { json, bad, clean, isEmail } from '../_lib/util.js';
 import { formInput } from '../_lib/forms.js';
-import { sendMail } from '../_lib/mail.js';
+import { sendMail, canMailPublic } from '../_lib/mail.js';
+import { welcomeEmail, memberAlert } from '../_lib/emails.js';
 import { upcomingEvents } from '../_lib/db.js';
 import { SITE } from '../_lib/page.js';
 
@@ -15,13 +17,17 @@ export async function onRequestPost(ctx) {
   };
   if (!m.name || !isEmail(m.email)) return bad('Please add your name and a valid email.');
 
-  const existing = await ctx.env.DB.prepare('SELECT id FROM members WHERE email = ?').bind(m.email).first();
-  if (existing) return json({ ok: true, already: true });
+  const db = ctx.env.DB;
+  if (await db.prepare('SELECT id FROM members WHERE email = ?').bind(m.email).first()) return json({ ok: true, already: true });
 
-  await ctx.env.DB.prepare(`INSERT INTO members (name, email, academic_year, department, interests, motivation) VALUES (?, ?, ?, ?, ?, ?)`)
+  await db.prepare(`INSERT INTO members (name, email, academic_year, department, interests, motivation) VALUES (?, ?, ?, ?, ?, ?)`)
     .bind(m.name, m.email, m.academic_year, m.department, m.interests, m.motivation).run();
-  const next = (await upcomingEvents(ctx.env.DB, 3)).map(e => ({ title: e.title, starts_at: e.starts_at, location: e.location, url: `${SITE}/events/${e.slug}` }));
-  const mailed = sendMail(ctx, { type: 'welcome', member: m, events: next });
-  if (mailed) ctx.waitUntil(ctx.env.DB.prepare(`UPDATE members SET status = 'welcomed', welcomed_at = strftime('%Y-%m-%dT%H:%M:%SZ','now') WHERE email = ?`).bind(m.email).run());
+
+  sendMail(ctx, ctx.env.ADMIN_NOTIFY, memberAlert(m), { replyTo: m.email });
+  if (canMailPublic(ctx.env)) {
+    const events = (await upcomingEvents(db, 3)).map(e => ({ ...e, url: `${SITE}/events/${e.slug}` }));
+    sendMail(ctx, m.email, welcomeEmail(m, events), { replyTo: ctx.env.ADMIN_NOTIFY });
+    ctx.waitUntil(db.prepare(`UPDATE members SET status = 'welcomed', welcomed_at = strftime('%Y-%m-%dT%H:%M:%SZ','now') WHERE email = ?`).bind(m.email).run());
+  }
   return json({ ok: true });
 }

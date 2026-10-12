@@ -26,7 +26,7 @@ functions/                     Server routes (file path = URL)
   api/admin/                   Admin API (Google sign-in session required)
   _lib/                        Shared: db queries, HTML views, auth, markdown, tech feed
 migrations/                    D1 schema and seed (numbered, applied in order)
-integrations/apps-script/      Gmail script that sends welcome and weekly emails
+workers/weekly-cron/           Tiny Worker that triggers the Monday email (Pages has no scheduler)
 scripts/build.mjs              Build: partials -> Tailwind -> icon sprite -> dist/
 tests/                         Vitest tests for the server logic
 ```
@@ -90,20 +90,47 @@ Only accounts listed in `ADMIN_EMAILS` (`wrangler.jsonc`) can get in. To create 
    `gdscau2023@gmail.com`. Basic sign-in (name, email) doesn't need Google's review.
 3. **Clients > Create client > Web application**. Under **Authorized JavaScript origins** add
    `https://gdg-africa-university.pages.dev` and `http://localhost:8788` (and your domain later).
-4. Copy the **Client ID** into `GOOGLE_CLIENT_ID` in `wrangler.jsonc`, commit, and deploy.
+4. Copy the **Client ID** into `GOOGLE_CLIENT_ID` in `wrangler.jsonc`, commit, and deploy. (The client
+   *secret* is not used: the site verifies Google's signed token with Google's public keys.)
+
+If the button shows but sign-in fails, the browser console says "The given origin is not allowed":
+the site's address is missing from Authorized JavaScript origins. Changes can take a few minutes.
 
 To add another admin, add their Gmail to `ADMIN_EMAILS` (comma separated) and deploy.
 
-### 3. Emails
-Follow [integrations/apps-script/README.md](integrations/apps-script/README.md). The admin
-Overview page shows a checklist of what's configured.
+### 3. Emails (Resend)
+
+The site sends mail through [Resend](https://resend.com): new-member and application alerts to
+`ADMIN_NOTIFY`, a welcome email to each new member, and every Monday at 07:00 (Harare) the
+WhatsApp-ready post plus the newsletter to subscribers.
+
+```bash
+npx wrangler pages secret put RESEND_API_KEY --project-name gdg-africa-university   # send-only key is enough
+openssl rand -hex 32   # use the same value for both:
+npx wrangler pages secret put CRON_SECRET --project-name gdg-africa-university
+npx wrangler secret put CRON_SECRET --config workers/weekly-cron/wrangler.jsonc
+npx wrangler deploy --config workers/weekly-cron/wrangler.jsonc
+```
+
+**Emails to students need your own domain.** Until one is verified, Resend only delivers from
+`onboarding@resend.dev` to the Resend account owner, so the site sends admin alerts only and skips
+welcome emails and the newsletter (the admin Overview shows this). To switch them on:
+
+1. Buy a domain (Cloudflare dashboard > Domain Registration, about US$10/yr for .com/.org).
+2. Resend > Domains > Add domain > copy the DNS records it shows into Cloudflare DNS for that domain. Wait for "Verified".
+3. In `wrangler.jsonc` set `MAIL_FROM` to e.g. `GDG Africa University <hello@yourdomain.org>`, then `npm run deploy`.
+4. Optional but recommended: Cloudflare Pages > Custom domains > add the domain; add it to the Google
+   client's Authorized JavaScript origins; update `SITE` in `functions/_lib/page.js` and `SITE_URL` in
+   `workers/weekly-cron/wrangler.jsonc`.
+
+Resend's free plan allows 100 emails a day and 3,000 a month.
 
 ## WhatsApp
 
 WhatsApp doesn't allow websites to post into an existing group safely (its official API only works
 for verified business numbers and groups of up to 8). Instead, every event in admin has a
 **WhatsApp** button that opens WhatsApp with the message ready, the Overview page has "This week's
-WhatsApp post", and the Monday email sends the same one-tap link.
+WhatsApp post", and the Monday email to the club inbox has the same one-tap link.
 
 ## Content sources
 

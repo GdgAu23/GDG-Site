@@ -107,3 +107,26 @@ describe('admin column whitelist', () => {
     expect(pick(TABLES.members, { status: 'welcomed', email: 'change@me' })).toEqual({ status: 'welcomed' });
   });
 });
+
+import { canMail, canMailPublic } from '../functions/_lib/mail.js';
+import { welcomeEmail, applicationAlert, whatsappDigestText } from '../functions/_lib/emails.js';
+
+describe('email', () => {
+  it('only mails students once a real domain is the sender', () => {
+    expect(canMail({})).toBe(false);
+    expect(canMailPublic({ RESEND_API_KEY: 'k' })).toBe(false);
+    expect(canMailPublic({ RESEND_API_KEY: 'k', MAIL_FROM: 'GDG AU <onboarding@resend.dev>' })).toBe(false);
+    expect(canMailPublic({ RESEND_API_KEY: 'k', MAIL_FROM: 'GDG AU <hello@gdgau.org>' })).toBe(true);
+  });
+  it('escapes member input in emails', () => {
+    const w = welcomeEmail({ name: '<img src=x onerror=alert(1)> Bob' }, []);
+    expect(w.html).not.toContain('<img src=x');
+    const a = applicationAlert('lead', { name: 'A', email: 'a@b.co', role: 'Lead', details: '<script>x</script>' });
+    expect(a.html).toContain('&lt;script&gt;');
+  });
+  it('builds the WhatsApp post', () => {
+    const t = whatsappDigestText([{ title: 'Jam', starts_at: '2026-10-16', location: 'Online', url: 'https://x/events/jam' }]);
+    expect(t).toContain('*Jam*');
+    expect(t).toContain('https://x/events/jam');
+  });
+});

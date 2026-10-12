@@ -1,6 +1,7 @@
 // GET: who am I (+ public sign-in config). POST: exchange a Google ID token for a session. DELETE: sign out.
 import { verifyGoogleToken, createSession, readSession, getCookie, sessionCookie, adminEmails, COOKIE, SESSION_MAX_AGE } from '../../_lib/auth.js';
 import { json, bad, readJson } from '../../_lib/util.js';
+import { canMail, canMailPublic } from '../../_lib/mail.js';
 
 const isLocal = (req) => ['localhost', '127.0.0.1'].includes(new URL(req.url).hostname);
 
@@ -11,7 +12,9 @@ export async function onRequestGet({ request, env }) {
     email: signedIn ? s.email : null,
     clientId: env.GOOGLE_CLIENT_ID || null,
     devLogin: isLocal(request) && !!env.DEV_ADMIN_EMAIL,
-    mail: !!(env.APPS_SCRIPT_URL && env.APPS_SCRIPT_SECRET),
+    mail: canMail(env),
+    mailPublic: canMailPublic(env),
+    cron: !!env.CRON_SECRET,
   });
 }
 

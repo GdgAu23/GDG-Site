@@ -1,0 +1,10 @@
+// Deploy: npx wrangler deploy --config workers/weekly-cron/wrangler.jsonc
+// Secret: npx wrangler secret put CRON_SECRET --config workers/weekly-cron/wrangler.jsonc  (same value as the site's)
+{
+  "name": "gdg-au-weekly-cron",
+  "main": "index.js",
+  "compatibility_date": "2026-10-06",
+  "triggers": { "crons": ["0 5 * * MON"] },
+  "vars": { "SITE_URL": "https://gdg-africa-university.pages.dev" },
+  "observability": { "enabled": true }
+}
